@@ -2,7 +2,7 @@
 Utility methods for downloading and preparing video frames.
 '''
 from os.path import dirname, abspath, exists, splitext, basename, join
-from os import system
+from os import system, listdir
 from PIL import Image
 import numpy as np
 import cv2
@@ -10,10 +10,12 @@ import re
 import pafy
 import shelve
 import pylab
+import tempfile
 
 import pdb
 
 ROOT = dirname(abspath(__file__))
+IMAGE_MEAN = [103.939, 116.779, 123.68]
 
 def get_prepared_images(url, ms_between_frames, use_cache=True):
   '''
@@ -50,6 +52,10 @@ def get_prepared_images(url, ms_between_frames, use_cache=True):
   return image_dir
 
 def image_frames_dir(url, ms_between_frames):
+  '''
+  Generates the image frames directory name unique to the video's url and
+  the frame rate in milliseconds.
+  '''
   return join(ROOT, 'data/images', get_video_id(url) + '_' +
               str(ms_between_frames))
 
@@ -71,7 +77,7 @@ def prepare_image(image):
   'Resizes the images to 256x256 and demeans the images.'
   image = resize_and_paste(image, (256, 256))
   image = np.asarray(image)
-  return (image - np.array([103.939, 116.779, 123.68])).astype(np.uint8)
+  return (image - np.array(IMAGE_MEAN)).astype(np.uint8)
 
 def resize_and_paste(image, new_shape):
   '''
@@ -96,6 +102,34 @@ def resize_and_paste(image, new_shape):
     cw, ch = image.size
     result.paste(image, ((new_width - cw) / 2, 0))
   return result
+
+def add_image_mean(image_filename):
+  '''
+  Adds back the neural net training set image mean that was subtracted
+  during classification.
+  '''
+  image = np.asarray(Image.open(image_filename)) # TODO open straight from np?
+  image = (image + np.asarray(IMAGE_MEAN)).astype(np.uint8)
+  image = Image.fromarray(image)
+  tf = tempfile.NamedTemporaryFile(dir='/tmp', delete=False)
+  image.save(tf.name, format='JPEG')
+  return tf.name
+
+def draw_image_labels(image_filename, labels):
+  'Draws the labels on the image and returns the new image filename.'
+  filename = add_image_mean(image_filename)
+  text = '\n'.join(labels)
+  target_parent = join('data/labelled-images',
+                       basename(dirname(image_filename)))
+  system('mkdir -p '+ target_parent)
+  target = join(target_parent, basename(image_filename))
+  cmd = ' '.join(
+    ['convert ' + image_filename,
+     '-pointsize 14 -fill green ',
+     '-draw "text 20%%,20%% \'%s\'"' % text,
+     target])
+  system(cmd)
+  return target
 
 def show_image(image):
   pylab.imshow(image)
@@ -134,3 +168,33 @@ def sanitized_video_title(title):
 
 def get_video_id(url):
   return re.match('.*v=(.*$)', url).groups()[0]
+
+def video_url(video_id):
+  return 'https://www.youtube.com/watch?v=' + video_id
+
+def write_video(image_dir):
+  '''
+  Writes a video from a set of images in `image_dir`
+  '''
+  target = join('data/labelled-videos',
+                basename(image_dir) + '.mp4v')
+  codec = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
+  size = (256, 256)
+  fps = 16
+  actual_frames_per_second = 0.25
+  v = cv2.VideoWriter(target, codec, fps, size)
+  for image_name in listdir(image_dir):
+    image_filename = join(image_dir, image_name)
+    arr = np.asarray(Image.open(image_filename))
+    assert arr.shape[:2] == size
+    for i in range(int(fps/actual_frames_per_second)):
+      v.write(arr)
+
+def approximate_video_segments(times):
+  '''
+  Arguments:
+    times: The times at which the noun was detected in the video, in seconds
+  Returns:
+    approximate segments of time at which the noun was detected
+  '''
+  pass
