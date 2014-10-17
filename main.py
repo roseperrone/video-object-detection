@@ -18,9 +18,11 @@ from video_utils import get_video, get_prepared_images, draw_image_labels, \
 
 
 ROOT = dirname(abspath(__file__))
-CLASSES = None # TODO use a memoize decorator instead
+CLASSES = None
 
 VIDEO_IDS = [
+  # how to make banana icecream
+  '9uddKYGPEkg',
   # how to hard boil an egg
   '1QK-DGlRcTo',
   '7-9OEohpivA',
@@ -69,62 +71,66 @@ def where_is_noun_in_video(video_id, noun):
   '''
   # TODO change 10,000 to 1,000 after the full pipeline works
   image_dir = get_prepared_images(video_url(video_id), 10000)
-  noun_detected_times = classify(image_dir, '19_layers')
-  #noun_detected_times = detect(image_dir)
-  #return approximate_video_segments(noun_detected_times)
+  classify(image_dir, noun)
 
-def detect(image_dir):
-  '''
-  '''
-  image_filenames_txt = '/tmp/image_filenames.txt'
-  with open(image_filenames_txt, 'w') as f:
-    # skip the mac .DS_Store file
-    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store']
-    f.write('\n'.join(image_filenames))
-  cmd = join(ROOT, 'caffe/python/detect.py')
-  cmd += ' --input_file=' + image_filenames_txt
-  cmd += ' --output_file=' + '/tmp/detection_results.csv'
-  cmd += ' --pretrained_model=../data/models/VGG_ILSVRC_19_layers.caffemodel'
-  system(cmd)
-  print cmd
-
-def classify(image_dir, network):
+def classify(image_dir, noun):
   '''
   `network` can be ccv_2012 or 19_layers
   '''
-  image_name = splitext(basename(image_file))[0]
-  image_path = join(image_dir, image_file)
-  if network == '19_layers':
-    for image_file in listdir(image_dir):
-      output = '/tmp/classification_results_' + image_name + '.npy'
-      cmd = join(ROOT, 'caffe/python/classify.py')
-      cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'
-      #cmd += ' --pretrained_model=data/models/VGG_ILSVRC_19_layers.caffemodel' TODO use this one
-      cmd += ' ' + image_path
-      cmd += ' ' + output
-      print cmd
-      system(cmd)
-      labels = top_labels(output) # TODO why all the same score?
-      draw_image_labels(image_path, labels)
-    write_video(image_dir)
-  elif network == 'ccv_2012':
-    for image_file in listdir(image_dir):
-      layer_offset = -2;
-      # TODO unfinished
-      lines = os.popen(
-        ' '.join([join(ROOT, 'DeepBelief/deepbelief'),
-                  file,
-                  join(ROOT, 'DeepBelief/ccv2012.ntwk '),
-                  str(layer_offset)])).read().split('\n')[:-1]
-  else:
-    raise Exception('That network is unsupported')
+  for image_file in listdir(image_dir):
+    image_name = splitext(basename(image_file))[0]
+    image_path = join(image_dir, image_file)
+    output = '/tmp/classification_results_' + image_name + '.npy'
+    cmd = join(ROOT, 'caffe/python/classify.py')
+    cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'
+    cmd += ' --channel_swap=\'\'' # the image is alreadiy BGR. No need to convert it.
+    #cmd += ' --pretrained_model=data/models/VGG_ILSVRC_19_layers.caffemodel' TODO use this one
+    cmd += ' ' + image_path
+    cmd += ' ' + output
+    print cmd
+    system(cmd)
+    top_100_labels, top_100_score_mean = top_labels(output, 100)
+    matching_label = [label for label in top_100_labels if noun in label]
+    label = '' if len(matching_label) == 0 else matching_label[0]
+    labels = [label, 'Top 10% mean: ' + "{0:.4f}".format(top_100_score_mean)]
+    print '\n'.join(labels)
+    draw_image_labels(image_path, labels)
+  write_video(image_dir)
 
-def top_labels(classification_output_file):
+#TODO: selective_search is not supported on mac os > 10.7. maybe try to link clang
+def detect(image_dir):
+  image_filenames_txt = '/tmp/image_filenames.txt'
+  with open(image_filenames_txt, 'w') as f:
+    # skip the mac .DS_Store file
+    image_filenames = [[join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store'][0]] # TODO remove the [0]
+    if len(image_filenames) > 1:
+      f.write('\n'.join(image_filenames))
+    else:
+      f.write(image_filenames[0])
+  cmd = join(ROOT, 'caffe/python/detect.py')
+  #cmd += ' --pretrained_model=../data/models/VGG_ILSVRC_19_layers.caffemodel'
+  cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'
+  cmd += ' --model_def=data/models/bvlc_reference_caffenet/deploy.prototxt'
+  cmd += ' ' + image_filenames_txt
+  cmd += ' /tmp/detection_results.csv'
+  system(cmd)
+  print cmd
+
+def top_labels(classification_output_file, n_top_scores=5):
+  '''
+  Returns:
+    A list of strings of the format <score> <claass names> for the
+    `n_top_scores` top scores, and the mean of the top `n_top_scores`
+  '''
   scores = np.load(classification_output_file).tolist()[0]
-  top_scores = heapq.nlargest(5, enumerate(scores), lambda x: x[1])
+  top_scores = heapq.nlargest(n_top_scores, enumerate(scores), lambda x: x[1])
+  total = 0
   for score in top_scores:
-    print scores[1], get_classes()[score[0]]
-  return [get_classes()[score[0]] for score in top_scores]
+    total += score[1]
+  mean = total / float(n_largest)
+  return (["{0:.4f}".format(score[1]) + ' ' + get_classes()[score[0]] \
+           for score in top_scores],
+          mean)
 
 def get_classes():
   '''
@@ -141,5 +147,5 @@ def get_classes():
 
 if __name__ == '__main__':
   for video_id in VIDEO_IDS:
-    print where_is_noun_in_video(video_id, 'cup')
+    where_is_noun_in_video(video_id, 'banana')
     pdb.set_trace()
