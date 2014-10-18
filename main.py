@@ -11,10 +11,12 @@ from os import system, listdir
 from os.path import dirname, abspath, join, splitext, basename
 import heapq
 import numpy as np
+import pandas as pd
 import pdb
+from collections import defaultdict
 
 from video_utils import get_video, get_prepared_images, draw_image_labels, \
-                        write_video, video_url
+                        write_video, video_url, draw_boxes
 
 
 ROOT = dirname(abspath(__file__))
@@ -71,7 +73,9 @@ def where_is_noun_in_video(video_id, noun):
   '''
   # TODO change 10,000 to 1,000 after the full pipeline works
   image_dir = get_prepared_images(video_url(video_id), 10000)
-  classify(image_dir, noun)
+  #classify(image_dir, noun)
+
+  detect(image_dir)
 
 def classify(image_dir, noun):
   '''
@@ -89,7 +93,8 @@ def classify(image_dir, noun):
     cmd += ' ' + output
     print cmd
     system(cmd)
-    top_100_labels, top_100_score_mean = top_labels(output, 100)
+    predictions = np.load(classification_output_file).tolist()[0]
+    top_100_labels, top_100_score_mean = top_labels(predictions, 100)
     matching_label = [label for label in top_100_labels if noun in label]
     label = '' if len(matching_label) == 0 else matching_label[0]
     labels = [label, 'Top 10% mean: ' + "{0:.4f}".format(top_100_score_mean)]
@@ -99,10 +104,23 @@ def classify(image_dir, noun):
 
 #TODO: selective_search is not supported on mac os > 10.7. maybe try to link clang
 def detect(image_dir):
+  '''
+  On mac 10.9 running MATLAB R2013a, to make the selective_search work
+  (the generator of the windows over which the classifier is run),
+  I needed to change 10.7 to 10.9 in
+  /Applications/MATLAB_R2013a_Student.app/bin/mexopts.sh, and
+  (see http://www.mathworks.com/matlabcentral/answers/87709-just-upgraded-to-x-code-5-0-on-my-mac)
+  add -std=c++11 to CXXFLAGS in said script.
+  Then in /Users/rose/video-object-detection/caffe/python/caffe/selective_search_ijcv_with_python/selective_search_rcnn
+  I needed to add -Dchar16_t=uint16_t to
+  mex Dependencies/anigaussm/anigauss_mex.c Dependencies/anigaussm/anigauss.c -output anigauss
+  (see http://stackoverflow.com/questions/22367516/mex-compile-error-unknown-type-name-char16-t)
+  '''
   image_filenames_txt = '/tmp/image_filenames.txt'
+  output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
     # skip the mac .DS_Store file
-    image_filenames = [[join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store'][0]] # TODO remove the [0]
+    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store'][:2] # TODO take out the [:2]
     if len(image_filenames) > 1:
       f.write('\n'.join(image_filenames))
     else:
@@ -112,24 +130,50 @@ def detect(image_dir):
   cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'
   cmd += ' --model_def=data/models/bvlc_reference_caffenet/deploy.prototxt'
   cmd += ' ' + image_filenames_txt
-  cmd += ' /tmp/detection_results.csv'
-  system(cmd)
+  # In detect.py, the .csv output
+  # code is buggy, and the hdf5 gave weird uint8 prediction values, so I
+  # pickled the pandas DataFrame instead.
+  cmd += ' ' + output_filename
   print cmd
+  system(cmd)
+  labelled_boxes = boxes_and_top_labels(output_filename, 3)
+  draw_boxes(labelled_boxes)
 
-def top_labels(classification_output_file, n_top_scores=5):
+def boxes_and_top_labels(detection_output_file, n_top_scores=5):
   '''
   Returns:
-    A list of strings of the format <score> <claass names> for the
-    `n_top_scores` top scores, and the mean of the top `n_top_scores`
+    a list of tuples that take the following format:
+    (xmin, xmin, xmax, ymax, predictions)
+      where the first four values indicate the bounding box
+      of the image with the detected predictions, and
+      predictions is a list of `n_top_scores` that each
+      take the format: (score, class)
   '''
-  scores = np.load(classification_output_file).tolist()[0]
-  top_scores = heapq.nlargest(n_top_scores, enumerate(scores), lambda x: x[1])
+  df = pd.read_pickle('/tmp/detection_results.bin')
+  labelled_boxes = defaultdict(list)
+  for i in range(df.index.shape[0]):
+    labelled_boxes[df.index[i]].append((df.xmin[i],
+      df.xmax[i],
+      df.ymin[i],
+      df.ymax[i],
+      top_labels(df.prediction[i].as_matrix())[0]))
+  return labelled_boxes
+
+def top_labels(predictions, n_top_predictions=5):
+  '''
+  Arguments:
+    predictions: a numpy 1x1000 array that contains one float per class
+  Returns:
+    a list of strings of the format <score> <claass names> for the
+    `n_top_predictions` top predictions, and the mean of the top `n_top_predictions`
+  '''
+  top_predictions = heapq.nlargest(n_top_predictions, enumerate(predictions), lambda x: x[1])
   total = 0
-  for score in top_scores:
-    total += score[1]
-  mean = total / float(n_largest)
-  return (["{0:.4f}".format(score[1]) + ' ' + get_classes()[score[0]] \
-           for score in top_scores],
+  for prediction in top_predictions:
+    total += prediction[1]
+  mean = total / float(n_top_predictions)
+  return (["{0:.4f}".format(prediction[1]) + ' ' + get_classes()[prediction[0]] \
+           for prediction in top_predictions],
           mean)
 
 def get_classes():

@@ -184,3 +184,22 @@ def write_video(image_dir):
     assert arr.shape[:2] == size
     for i in range(int(fps/actual_frames_per_second)):
       v.write(arr[:, :, (2, 1, 0)]) # convert RGB to BGR, the opencv standard
+
+def draw_boxes(labelled_boxes):
+  target_dir = 'data/boxed-images'
+  for image_filename, boxes in labelled_boxes.iteritems():
+    for i, tup in enumerate(boxes):
+      xmin, xmax, ymin, ymax, labels = tup
+      target = join(target_dir,
+                    splitext(basename(image_filename))[0] + '_' + \
+                    str(i) + '.jpg')
+      cmd = 'convert ' + image_filename
+      cmd += ' -fill none -stroke green -strokewidth 2'
+      cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
+                (int(xmin), int(ymin), int(xmax), int(ymax)))
+      cmd += ' -pointsize 14 -fill green '
+      cmd += ' -draw "text 20%%,20%% \'%s\'"' % '\n'.join(labels)
+      cmd += ' ' + target
+      print cmd
+      system(cmd)
+
