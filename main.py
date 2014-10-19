@@ -75,7 +75,7 @@ def where_is_noun_in_video(video_id, noun):
   image_dir = get_prepared_images(video_url(video_id), 10000)
   #classify(image_dir, noun)
 
-  detect(image_dir)
+  detect(image_dir, noun)
 
 def classify(image_dir, noun):
   '''
@@ -103,7 +103,7 @@ def classify(image_dir, noun):
   write_video(image_dir)
 
 #TODO: selective_search is not supported on mac os > 10.7. maybe try to link clang
-def detect(image_dir):
+def detect(image_dir, noun):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
   (the generator of the windows over which the classifier is run),
@@ -136,8 +136,24 @@ def detect(image_dir):
   cmd += ' ' + output_filename
   print cmd
   system(cmd)
-  labelled_boxes = boxes_and_top_labels(output_filename, 3)
-  draw_boxes(labelled_boxes)
+  labelled_boxes = boxes_and_top_labels(output_filename, 100)
+  boxes_containing_noun = find_boxes_containing_noun(labelled_boxes, noun)
+  draw_boxes(boxes_containing_noun)
+
+def find_boxes_containing_noun(labelled_boxes, noun):
+  found = defaultdict(list)
+  for image_filename, boxes in labelled_boxes.iteritems():
+    for i, tup in enumerate(boxes):
+      xmin, xmax, ymin, ymax, labels = tup
+      for label in labels:
+        if noun in label:
+          found[image_filename].append((image_filename, (xmin, xmax, ymin, ymax, [label])))
+          pdb.set_trace()
+    if len(found[image_filename]) == 0:
+      found[image_filename].append((0, 0, 0, 0, ['Not found']))
+  return found
+
+
 
 def boxes_and_top_labels(detection_output_file, n_top_scores=5):
   '''
