@@ -15,55 +15,20 @@ import pandas as pd
 import pdb
 from collections import defaultdict
 
-from video_utils import get_video, get_prepared_images, draw_image_labels, \
+from performance_stats import timeit
+from video_metadata import NOUNS_AND_VIDEO_IDS
+from video_utils import get_prepared_images, draw_image_labels, \
                         write_video, video_url, draw_boxes
 
+import gflags
+from gflags import FLAGS
+
+USE_CACHE = True
+HUSH_CAFFE = False
 
 ROOT = dirname(abspath(__file__))
 CLASSES = None
-
-VIDEO_IDS = [
-  # how to make banana icecream
-  '9uddKYGPEkg',
-  # how to hard boil an egg
-  '1QK-DGlRcTo',
-  '7-9OEohpivA',
-  'lbzhyvH74w8',
-  'qX7A0LPIuKs',
-  's1oUDsonIzg',
-  'sSni2HTfvM',
-  'wdasrVE5NOc',
-  'zuMslqJKQo',
-  # how to poach an egg
-  'jk36el4_Rbc',
-  'JrRqG9Apt6g',
-  'KtZ14xEbgzg',
-  'pAWduxoCgVk',
-  'UMiCy8EH1go',
-  'xpN1dlH3tWo',
-  'yppgDL0Mn3g',
-  # how to scramble an egg
-  '65ifzkFi614',
-  'FbLU87PYsZE',
-  'Nbh64ntT3EM',
-  'R4vDqlKMbrk',
-  's9r-CxnCXkg',
-  'TGyb7uBXe9E',
-  'Be0koDmxrtQ',
-  'M8SHMUBnm4A',
-  'PUP7U5vTMM0',
-  's9r-CxnCXkg',
-  # how to make an omelet
-  '1dGBRGtyzX0',
-  '57afEWn-QDg',
-  'AgHgbn_sVUw',
-  'AJ2uBYCVHik',
-  'OQyRuOEKfVk',
-  'PLDUqyS2AGA',
-  'PzWsyPHoSyQ',
-  'r09Hgeb9-6s',
-  'zglsDdaBf4g',
-  ]
+N_FRAMES = 2 # just for testing the pipeline
 
 def where_is_noun_in_video(video_id, noun):
   '''
@@ -72,9 +37,8 @@ def where_is_noun_in_video(video_id, noun):
     in seconds. e.g. [(14.4, 20.2), (34.2, 89.2)]
   '''
   # TODO change 10,000 to 1,000 after the full pipeline works
-  image_dir = get_prepared_images(video_url(video_id), 10000)
+  image_dir = get_prepared_images(video_url(video_id), 10000, USE_CACHE)
   #classify(image_dir, noun)
-
   detect(image_dir, noun)
 
 def classify(image_dir, noun):
@@ -91,6 +55,8 @@ def classify(image_dir, noun):
     #cmd += ' --pretrained_model=data/models/VGG_ILSVRC_19_layers.caffemodel' TODO use this one
     cmd += ' ' + image_path
     cmd += ' ' + output
+    if HUSH_CAFFE:
+      cmd += ' > /dev/null'
     print cmd
     system(cmd)
     predictions = np.load(classification_output_file).tolist()[0]
@@ -103,6 +69,8 @@ def classify(image_dir, noun):
   write_video(image_dir)
 
 #TODO: selective_search is not supported on mac os > 10.7. maybe try to link clang
+
+@timeit
 def detect(image_dir, noun):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
@@ -120,7 +88,7 @@ def detect(image_dir, noun):
   output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
     # skip the mac .DS_Store file
-    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store'][:2] # TODO take out the [:2]
+    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store']#[:N_FRAMES]
     if len(image_filenames) > 1:
       f.write('\n'.join(image_filenames))
     else:
@@ -134,11 +102,17 @@ def detect(image_dir, noun):
   # code is buggy, and the hdf5 gave weird uint8 prediction values, so I
   # pickled the pandas DataFrame instead.
   cmd += ' ' + output_filename
+  if HUSH_CAFFE:
+    cmd += ' > /dev/null'
   print cmd
   system(cmd)
+  draw_results(output_filename, basename(image_dir), noun)
+
+@timeit
+def draw_results(output_filename, image_dir_name, noun):
   labelled_boxes = boxes_and_top_labels(output_filename, 100)
   boxes_containing_noun = find_boxes_containing_noun(labelled_boxes, noun)
-  draw_boxes(boxes_containing_noun)
+  draw_boxes(boxes_containing_noun, image_dir_name)
 
 def find_boxes_containing_noun(labelled_boxes, noun):
   found = defaultdict(list)
@@ -146,14 +120,12 @@ def find_boxes_containing_noun(labelled_boxes, noun):
     for i, tup in enumerate(boxes):
       xmin, xmax, ymin, ymax, labels = tup
       for label in labels:
-        if noun in label:
+        if noun in label: # FIXME: egg is not eggnog.
           found[image_filename].append((image_filename, (xmin, xmax, ymin, ymax, [label])))
-          pdb.set_trace()
+          #pdb.set_trace()
     if len(found[image_filename]) == 0:
       found[image_filename].append((0, 0, 0, 0, ['Not found']))
   return found
-
-
 
 def boxes_and_top_labels(detection_output_file, n_top_scores=5):
   '''
@@ -206,6 +178,7 @@ def get_classes():
   return CLASSES
 
 if __name__ == '__main__':
-  for video_id in VIDEO_IDS:
-    where_is_noun_in_video(video_id, 'banana')
-    pdb.set_trace()
+  for noun, video_id_list in NOUNS_AND_VIDEO_IDS.iteritems():
+    for video_id in video_id_list:
+      where_is_noun_in_video(video_id, noun)
+      pdb.set_trace()
