@@ -30,7 +30,7 @@ def top_labels(predictions, n_top_predictions=5):
            for prediction in top_predictions],
           mean)
 
-def boxes_and_top_labels(detection_output_file, n_top_scores=5):
+def boxes_and_top_labels(detection_output_file, n_top_predictions=100):
   '''
   Returns:
     a list of tuples that take the following format:
@@ -43,11 +43,11 @@ def boxes_and_top_labels(detection_output_file, n_top_scores=5):
   df = pd.read_pickle('/tmp/detection_results.bin')
   labelled_boxes = defaultdict(list)
   for i in range(df.index.shape[0]):
-    labelled_boxes[df.index[i]].append((df.xmin[i],
-      df.xmax[i],
-      df.ymin[i],
-      df.ymax[i],
-      top_labels(df.prediction[i].as_matrix())[0]))
+    labels = top_labels(df.prediction[i].as_matrix(), n_top_predictions)[0]
+    labelled_boxes[df.index[i]].append(
+      (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i], labels)
+    )
+
   return labelled_boxes
 
 CLASSES = None

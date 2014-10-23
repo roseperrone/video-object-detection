@@ -69,7 +69,7 @@ def _find_boxes_containing_noun(labelled_boxes, noun):
       xmin, xmax, ymin, ymax, labels = tup
       for label in labels:
         if noun in label: # FIXME: egg is not eggnog.
-          found[image_filename].append((image_filename, (xmin, xmax, ymin, ymax, [label])))
+          found[image_filename].append((xmin, xmax, ymin, ymax, [label]))
     if len(found[image_filename]) == 0:
       found[image_filename].append((0, 0, 0, 0, ['Not found']))
   return found
