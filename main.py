@@ -71,7 +71,5 @@ def test_classification_of_bananas():
     test_classification(image, 'banana')
 
 if __name__ == '__main__':
-  #show_nouns_in_videos()
-  draw_detector_results('/tmp/detection_results.bin', '9uddKYGPEkg_10000',
-                        'banana')
+  show_nouns_in_videos()
 

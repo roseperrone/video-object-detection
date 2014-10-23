@@ -3,7 +3,7 @@ Uses a pretrained model on the ImageNet dataset to predict the liklihood
 the entire image displays any of 1000 categories.
 '''
 
-from os import system, listdir
+from os import system
 from os.path import join, splitext, basename, dirname, abspath
 import numpy as np
 

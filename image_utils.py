@@ -2,8 +2,8 @@
 Utility functions for preparing video frames
 '''
 
-from os.path import exists, join, dirname, abspath
-from os import system
+from os.path import exists, join, dirname, abspath, splitext, basename
+from os import system, listdir
 from PIL import Image
 import numpy as np
 import cv2
@@ -96,3 +96,13 @@ def convert_bgr_to_rgb(image_filename, channel_order=(2,1,0)):
 def show_image(image):
   pylab.imshow(image)
   pylab.show()
+
+def ordered_listdir(image_dir):
+  '''
+  Returns a list of image basenames in `image_dir`, ordered numerically
+  by name. e.g. 7.jpg is listed before 10.jpg.
+  '''
+  # skip the mac .DS_Store file
+  filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store']
+  return sorted(filenames, key=lambda x: int(splitext(basename(x))[0]))
+
