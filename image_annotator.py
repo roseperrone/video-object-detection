@@ -37,7 +37,7 @@ def draw_boxes(labelled_boxes, image_dir_name):
       target = join(target_dir,
                     splitext(basename(image_filename))[0] + '_' + \
                     str(i) + '.jpg')
-      cmd = 'convert ' + image_filename
+      cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
       if not (xmin == 0 and ymin == 0 and xmax == 0 and ymax == 0):
         cmd += ' -fill none -stroke green -strokewidth 2'
         cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
