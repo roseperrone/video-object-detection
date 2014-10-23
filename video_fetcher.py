@@ -1,6 +1,7 @@
 from os.path import dirname, abspath, exists, splitext, basename, join
 from os import system
 import pafy
+import re
 
 from performance import timeit
 

@@ -33,8 +33,9 @@ def where_is_noun_in_video(video_id, noun):
     in seconds. e.g. [(14.4, 20.2), (34.2, 89.2)]
   '''
   # TODO change 10,000 to 1,000 after the full pipeline works
-  video_filename = get_video(url)
-  image_dir = get_prepared_images(video_url(video_id), 10000)
+  url = video_url(video_id)
+  video_filename = fetch_video(url)
+  image_dir = get_prepared_images(url, 10000, video_filename)
   predictions_filename = detect(image_dir, noun)
   draw_detector_results(predictions_filename, basename(image_dir), noun)
 
@@ -70,4 +71,7 @@ def test_classification_of_bananas():
     test_classification(image, 'banana')
 
 if __name__ == '__main__':
-  test_classification_of_bananas()
+  #show_nouns_in_videos()
+  draw_detector_results('/tmp/detection_results.bin', '9uddKYGPEkg_10000',
+                        'banana')
+

@@ -49,4 +49,13 @@ def timeit(f):
     ====================================================
     ====================================================
     detect took 4889.1707 seconds
+
+  7 frames:
+    downloading the video       4 (get_video)
+    preparing the image frames  6 (prepare_images)
+    selecting windows           32 (get_windows)
+    Processed 6118 windows in 664.322 s.
+
+    predicting nouns in windows 1862 (detect_windows)
+    drawing the resullts        10 (draw_results)
 '''

@@ -1,7 +1,12 @@
 
+from os.path import join, dirname, abspath
+from os import system, listdir
+
 from performance import timeit
 
+N_FRAMES = 7
 HUSH_CAFFE = False
+ROOT = dirname(abspath(__file__))
 
 @timeit
 def detect(image_dir, noun):
@@ -21,7 +26,7 @@ def detect(image_dir, noun):
   output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
     # skip the mac .DS_Store file
-    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store']#[:N_FRAMES]
+    image_filenames = [join(image_dir, x) for x in listdir(image_dir) if not x == '.DS_Store'][:N_FRAMES] # TODO take out [:N_FRAMES]
     if len(image_filenames) > 1:
       f.write('\n'.join(image_filenames))
     else:

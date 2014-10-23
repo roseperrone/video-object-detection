@@ -9,6 +9,7 @@ import numpy as np
 import cv2
 import tempfile
 import pylab
+import re
 
 from performance import timeit
 
@@ -25,12 +26,8 @@ def get_prepared_images(url, ms_between_frames, video_filename):
   '''
   image_dir = image_frames_dir(url, ms_between_frames)
   if exists(image_dir):
-    if use_cache:
-      return image_dir
-    else:
-      system('rm -rf ' + image_dir)
+    return image_dir
   system('mkdir -p ' + image_dir)
-  video_filename = fetch_video(url)
   return _prepare_images(video_filename, image_dir, ms_between_frames)
 
 @timeit
@@ -56,8 +53,8 @@ def image_frames_dir(url, ms_between_frames):
   Generates the image frames directory name unique to the video's url and
   the frame rate in milliseconds.
   '''
-  return join(ROOT, 'data/images', get_video_id(url) + '_' +
-              str(ms_between_frames))
+  video_id = re.match('.*v=(.*$)', url).groups()[0]
+  return join(ROOT, 'data/images', video_id + '_' + str(ms_between_frames))
 
 def prepare_image(bgr_image):
   'Resizes the images to 256x256'
