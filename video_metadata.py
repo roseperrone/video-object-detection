@@ -29,13 +29,13 @@ Tie a Tie (1,522,161 views)
 '''
 
 NOUNS_AND_VIDEO_IDS = OrderedDict([
+  ('wine',
+    ['n63SWcNNWvg',
+    ],
+  ),
   ('banana',
     # how to make banana icecream
     ['9uddKYGPEkg', # the classifier has a recall of 50% and precision of 100%
-    ],
-  ),
-  ('wine',
-    ['n63SWcNNWvg',
     ],
   ),
   ('egg', # This noun is not in the ImageNet set and won't be detected

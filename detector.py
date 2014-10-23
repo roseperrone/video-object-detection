@@ -5,7 +5,7 @@ from os import system
 from performance import timeit
 from image_utils import ordered_listdir
 
-N_FRAMES = 7
+N_FRAMES = 10
 HUSH_CAFFE = False
 ROOT = dirname(abspath(__file__))
 
@@ -26,12 +26,9 @@ def detect(image_dir, noun):
   image_filenames_txt = '/tmp/image_filenames.txt'
   output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
-    # skip the mac .DS_Store file
-    image_filenames = [join(image_dir, x) for x in ordered_listdir(image_dir) if not x == '.DS_Store'][:N_FRAMES] # TODO take out [:N_FRAMES]
-    if len(image_filenames) > 1:
-      f.write('\n'.join(image_filenames))
-    else:
-      f.write(image_filenames[0])
+    # the first frame is usually blank, or a title screen
+    image_filenames = ordered_listdir(image_dir)[1:N_FRAMES] # TODO take out [:N_FRAMES]
+    f.write('\n'.join(image_filenames))
   cmd = join(ROOT, 'caffe/python/detect.py')
   #cmd += ' --pretrained_model=../data/models/VGG_ILSVRC_19_layers.caffemodel'
   cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'

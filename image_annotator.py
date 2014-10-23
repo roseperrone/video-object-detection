@@ -9,6 +9,7 @@ from imagenet import top_labels, boxes_and_top_labels
 from image_utils import convert_bgr_to_rgb
 from performance import timeit
 
+TOP_PERCENTAGE = 0.05
 
 def draw_image_labels(image_filename, labels):
   '''
@@ -30,6 +31,7 @@ def draw_image_labels(image_filename, labels):
 
 def draw_boxes(labelled_boxes, image_dir_name):
   target_dir = join('data/boxed-images', image_dir_name)
+  system('rm -rf ' + target_dir)
   system('mkdir -p ' + target_dir)
   for image_filename, boxes in labelled_boxes.iteritems():
     for i, tup in enumerate(boxes):
@@ -49,16 +51,16 @@ def draw_boxes(labelled_boxes, image_dir_name):
       system(cmd)
 
 def draw_classifier_results(predictions, noun, image_filename):
-  top_100_labels, top_100_score_mean = top_labels(predictions, 100)
+  top_100_labels, top_100_score_mean = top_labels(predictions, int(TOP_PERCENTAGE * 1000))
   matching_label = [label for label in top_100_labels if noun in label]
   label = '' if len(matching_label) == 0 else matching_label[0]
-  labels = [label, "{0:.4f}".format(top_100_score_mean) + ' Top 10% mean']
+  labels = [label, "{0:.4f}".format(top_100_score_mean) + ' Top ' + str(100*TOP_PERCENTAGE) + '% mean']
   print '\n'.join(labels)
   return draw_image_labels(image_filename, labels)
 
 @timeit
 def draw_detector_results(output_filename, image_dir_name, noun):
-  labelled_boxes = boxes_and_top_labels(output_filename, 100)
+  labelled_boxes = boxes_and_top_labels(output_filename, int(TOP_PERCENTAGE * 1000))
   boxes_containing_noun = _find_boxes_containing_noun(labelled_boxes, noun)
   draw_boxes(boxes_containing_noun, image_dir_name)
 

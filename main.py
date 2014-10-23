@@ -72,4 +72,3 @@ def test_classification_of_bananas():
 
 if __name__ == '__main__':
   show_nouns_in_videos()
-
