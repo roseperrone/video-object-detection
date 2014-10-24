@@ -8,8 +8,7 @@ from os.path import join, splitext, basename, dirname, abspath
 import numpy as np
 
 from imagenet import top_labels
-
-HUSH_CAFFE = False
+from config import HUSH_CAFFE
 
 ROOT = dirname(abspath(__file__))
 

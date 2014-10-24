@@ -1,29 +1,7 @@
 from collections import OrderedDict, defaultdict
 
 from youtube_crawler import search_youtube
-
-# TODO put this in the config
-QUERIES_AND_NOUNS = OrderedDict([
-  # egg is not present in the 1000 ImageNet categories
-  ('how to hard boil an egg', ['stove']),
-  ('how to make scrambled eggs', ['stove', 'skillet']),
-  ('how to cook an omelet', ['stove', 'skillet']),
-  ('how to poach an egg', ['stove']),
-  #('how to make jello shots', ['measuring cup']),
-  ('how to make french toast', ['skillet', 'mixing bowl', 'stove']),
-  ('how to make pancakes', ['skillet', 'mixing bowl', 'stove']),
-  ('how to make chocolate chip cookies', ['skillet', 'mixing bowl', 'stove']),
-  ('how to make a grilled cheese sandwich', ['skillet', 'stove']),
-  #('how to bake a potato in the microwave', ['microwave']),
-  #('how to open a wine bottle without a corkscrew', ['wine']),
-  ('how to jump start your car', ['sport car', 'street sign', 'car wheel']),
-  ('how to make yogurt', ['soup boowl']),
-  ('how to remove a stripped screw', ['screw', 'screwdriver']),
-  ('how to drive a car', ['sport car', 'street sign', 'car mirror']),
-  #('how to clean suede shoes', ['cowboy boot']),
-  #('how to unclog a bathtub drain', ['bathtub']),
-  #('how to tie a tie', ['Windsor tie']),
-])
+from config import QUERIES_AND_NOUNS
 
 def invert_dictionary(d):
   '''

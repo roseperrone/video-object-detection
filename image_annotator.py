@@ -8,8 +8,7 @@ import cv2
 from imagenet import top_labels, boxes_and_top_labels
 from image_utils import convert_bgr_to_rgb
 from performance import timeit
-
-TOP_PERCENTAGE = 0.01
+from config import TOP_PERCENTAGE
 
 def draw_image_labels(image_filename, labels):
   '''

@@ -39,7 +39,6 @@ def get_stream(video):
 def convert_video_to_mp4(filename):
   'OpenCV seems to only like mp4'
   target = converted_mp4_filename(filename)
-  print target
   system('ffmpeg -i ' + filename + ' -vcodec copy ' + target)
   return target
 

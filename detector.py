@@ -4,9 +4,8 @@ from os import system
 
 from performance import timeit
 from image_utils import ordered_listdir
+from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 
-N_FRAMES = 4 # just for testing the pipeline # TODO use a config file
-HUSH_CAFFE = False
 ROOT = dirname(abspath(__file__))
 
 @timeit
@@ -27,7 +26,8 @@ def detect(image_dir, noun):
   output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
     # the first frame is usually blank, or a title screen
-    image_filenames = ordered_listdir(image_dir)[1:N_FRAMES+1] # TODO take out [:N_FRAMES]
+    image_filenames = ordered_listdir(
+      image_dir)[NUM_FIRST_FRAMES_SKIPPED:N_FRAMES+1]
     f.write('\n'.join(image_filenames))
   cmd = join(ROOT, 'caffe/python/detect.py')
   #cmd += ' --pretrained_model=../data/models/VGG_ILSVRC_19_layers.caffemodel'
