@@ -9,9 +9,9 @@
 from os.path import dirname, abspath, basename
 from PIL import Image
 import numpy as np
+from datetime import datetime
 
-from video_metadata import NOUNS_AND_VIDEO_IDS
-
+from video_id_fetcher import get_nouns_and_video_ids
 from video_fetcher import video_url, fetch_video
 from image_utils import get_prepared_images
 from classifier import classify
@@ -19,11 +19,6 @@ from detector import detect
 from image_annotator import (draw_detector_results,
                              draw_classifier_results)
 from image_utils import show_image
-
-HUSH_CAFFE = False
-ROOT = dirname(abspath(__file__))
-CLASSES = None
-N_FRAMES = 2 # just for testing the pipeline
 
 
 def where_is_noun_in_video(video_id, noun):
@@ -39,11 +34,22 @@ def where_is_noun_in_video(video_id, noun):
   predictions_filename = detect(image_dir, noun)
   draw_detector_results(predictions_filename, basename(image_dir), noun)
 
-def show_nouns_in_videos():
-  for noun, video_id_list in NOUNS_AND_VIDEO_IDS.iteritems():
-    for video_id in video_id_list:
-      where_is_noun_in_video(video_id, noun)
-      import pdb; pdb.set_trace()
+def show_nouns_in_videos(num_videos_per_noun):
+  '''
+  Run tail -f /tmp/detector_log.txt to see progress.
+  '''
+  log_filename = '/tmp/detector_log.txt'
+  with open(log_filename, 'a') as f:
+    for noun, video_id_list in get_nouns_and_video_ids(
+                        num_videos_per_noun).iteritems():
+      for i, video_id in enumerate(video_id_list):
+        where_is_noun_in_video(video_id, noun)
+        f.write(' '.join([str(datetime.now()),
+                          noun,
+                          video_id,
+                          str(i) + '/' + str(num_videos_per_noun) + '\n',
+                         ]))
+        f.flush()
 
 def test_classification(image_filename, noun):
   '''
@@ -71,4 +77,4 @@ def test_classification_of_bananas():
     test_classification(image, 'banana')
 
 if __name__ == '__main__':
-  show_nouns_in_videos()
+  show_nouns_in_videos(1)

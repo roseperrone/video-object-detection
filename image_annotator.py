@@ -9,7 +9,7 @@ from imagenet import top_labels, boxes_and_top_labels
 from image_utils import convert_bgr_to_rgb
 from performance import timeit
 
-TOP_PERCENTAGE = 0.05
+TOP_PERCENTAGE = 0.01
 
 def draw_image_labels(image_filename, labels):
   '''
@@ -17,6 +17,7 @@ def draw_image_labels(image_filename, labels):
   Returns the new image filename.
   '''
   text = '\n'.join(labels)
+  text += '\nfound in top ' + str(100*TOP_PERCENTAGE) + '% of 1000 classes'
   target_parent = join('data/labelled-images',
                        basename(dirname(image_filename)))
   system('mkdir -p '+ target_parent)
@@ -45,7 +46,9 @@ def draw_boxes(labelled_boxes, image_dir_name):
         cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
                   (int(xmin), int(ymin), int(xmax), int(ymax)))
       cmd += ' -pointsize 14 -fill green '
-      cmd += ' -draw "text 20%%,20%% \'%s\'"' % '\n'.join(labels)
+      text = '\n'.join(labels)
+      text += '\nfound in top ' + str(100*TOP_PERCENTAGE) + '% of 1000 classes'
+      cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
       cmd += ' ' + target
       print cmd
       system(cmd)

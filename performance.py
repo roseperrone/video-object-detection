@@ -33,7 +33,7 @@ def timeit(f):
     preparing the image frames  6 (prepare_images)
     selecting windows           10, 11, 9 (get_windows)
     predicting nouns in windows 54, 97, 80 (detect_windows)
-    drawing the resullts        N (draw_results)
+    drawing the results         N (draw_results)
 
 
   21 frames:
@@ -41,7 +41,7 @@ def timeit(f):
     preparing the image frames  6 (prepare_images)
     selecting windows           93 (get_windows)
     predicting nouns in windows 1862 (detect_windows)
-    drawing the resullts        N (draw_results)
+    drawing the results         N (draw_results)
 
     I think one of these was stalled on something...
     ====================================================
@@ -57,5 +57,10 @@ def timeit(f):
     Processed 6118 windows in 664.322 s.
 
     predicting nouns in windows 1862 (detect_windows)
-    drawing the resullts        10 (draw_results)
+    drawing the results        10 (draw_results)
+
+  9 frames, top 5%:
+    get_windos took 28 seconds
+    Processed 6268 windows in 477 seconds
+    draw_detector_results took 33 seconds
 '''
