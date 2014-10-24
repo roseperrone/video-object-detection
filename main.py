@@ -11,17 +11,18 @@ from PIL import Image
 import numpy as np
 from datetime import datetime
 
-from video_id_fetcher import get_nouns_and_video_ids
+from video_id_fetcher import get_noun_ids_and_video_ids
 from video_fetcher import video_url, fetch_video
 from image_utils import get_prepared_images
 from classifier import classify
 from detector import detect
-from image_annotator import (draw_detector_results,
-                             draw_classifier_results)
+from image_annotator import draw_detector_results
 from image_utils import show_image
 
+from config import TOP_PERCENTAGE
 
-def where_is_noun_in_video(video_id, noun):
+
+def where_is_noun_in_video(video_id, noun_id):
   '''
   Returns:
     a list of tuples of video segments in which that noun appears,
@@ -31,8 +32,12 @@ def where_is_noun_in_video(video_id, noun):
   url = video_url(video_id)
   video_filename = fetch_video(url)
   image_dir = get_prepared_images(url, 10000, video_filename)
-  predictions_filename = detect(image_dir, noun)
-  draw_detector_results(predictions_filename, basename(image_dir), noun)
+  predictions_filename = detect(image_dir)
+  draw_detector_results(predictions_filename,
+    '_'.join([basename(image_dir),
+              noun_id,
+              str(int(1000 * TOP_PERCENTAGE))]),
+    noun_id)
 
 def show_nouns_in_videos(num_videos_per_noun):
   '''
@@ -40,24 +45,25 @@ def show_nouns_in_videos(num_videos_per_noun):
   '''
   log_filename = '/tmp/detector_log.txt'
   with open(log_filename, 'a') as f:
-    for noun, video_id_list in get_nouns_and_video_ids(
+    for noun_id, video_id_list in get_noun_ids_and_video_ids(
                         num_videos_per_noun).iteritems():
       for i, video_id in enumerate(video_id_list):
-        where_is_noun_in_video(video_id, noun)
+        where_is_noun_in_video(video_id, noun_id)
         f.write(' '.join([str(datetime.now()),
-                          noun,
+                          noun_id,
                           video_id,
                           str(i) + '/' + str(num_videos_per_noun) + '\n',
                          ]))
         f.flush()
 
-def test_classification(image_filename, noun):
+def test_classification(image_filename, noun_id):
   '''
   Classifies one BGR image and shows the results
   '''
+  # TODO this is out of date
   predictions = classify(image_filename)
   image = np.asarray(Image.open(
-    draw_classifier_results(predictions, noun, image_filename)))
+    draw_classifier_results(predictions, noun_id, image_filename)))
   Image.fromarray(image).save(
     'data/labelled-test-images/' + basename(image_filename))
   show_image(image)
@@ -77,4 +83,7 @@ def test_classification_of_bananas():
     test_classification(image, 'banana')
 
 if __name__ == '__main__':
-  show_nouns_in_videos(1)
+  #show_nouns_in_videos(1)
+  draw_detector_results('/tmp/detection_results.bin',
+    'zPN6ec7SevU_10000_n02965783',
+    'n02965783')

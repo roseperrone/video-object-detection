@@ -9,7 +9,7 @@ from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 ROOT = dirname(abspath(__file__))
 
 @timeit
-def detect(image_dir, noun):
+def detect(image_dir):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
   (the generator of the windows over which the classifier is run),

@@ -22,7 +22,7 @@ QUERIES_AND_NOUNS = OrderedDict([
   #('how to bake a potato in the microwave', ['microwave']),
   #('how to open a wine bottle without a corkscrew', ['wine']),
   ('how to jump start your car', ['sport car', 'street sign', 'car wheel']),
-  ('how to make yogurt', ['soup boowl']),
+  ('how to make yogurt', ['soup bowl']),
   ('how to remove a stripped screw', ['screw', 'screwdriver']),
   ('how to drive a car', ['sport car', 'street sign', 'car mirror']),
   #('how to clean suede shoes', ['cowboy boot']),
@@ -32,7 +32,7 @@ QUERIES_AND_NOUNS = OrderedDict([
 
 # The number of frames per video in which detect the noun
 # (to be removed when parameters and models are improved)
-N_FRAMES = 4
+N_FRAMES = 1
 
 # The number of frames skipped at the beggining of each video,
 # Because they're usually title screens
@@ -40,5 +40,3 @@ NUM_FIRST_FRAMES_SKIPPED = 1
 
 # caffe prints a lot
 HUSH_CAFFE = True
-
-

@@ -2,6 +2,7 @@ from collections import OrderedDict, defaultdict
 
 from youtube_crawler import search_youtube
 from config import QUERIES_AND_NOUNS
+from imagenet import get_noun_id
 
 def invert_dictionary(d):
   '''
@@ -18,7 +19,7 @@ def invert_dictionary(d):
       new_dict[elem].append(k)
   return new_dict
 
-def get_nouns_and_video_ids(num_videos_per_noun):
+def get_noun_ids_and_video_ids(num_videos_per_noun):
   '''
   Returns:
     an OrderedDict that contains alphabetically ordered nouns as keys,
@@ -35,7 +36,7 @@ def get_nouns_and_video_ids(num_videos_per_noun):
       if remainder > 0:
         fetch_this_many_video_ids += remainder
         remainder = 0
-      d[noun].extend(search_youtube(query, fetch_this_many_video_ids))
+      d[get_noun_id(noun)].extend(search_youtube(query, fetch_this_many_video_ids))
   return OrderedDict(sorted(d.items()))
       # TODO make sure there are no duplicate video_ids, and maybe have a
       # (noun,video_id) blacklist if the noun isn't present in the video
