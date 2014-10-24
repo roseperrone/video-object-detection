@@ -82,8 +82,12 @@ def test_classification_of_bananas():
   for image in images:
     test_classification(image, 'banana')
 
-if __name__ == '__main__':
-  #show_nouns_in_videos(1)
+def test_image_annotator():
+  # set the TOP_PERCENTAGE to 0.005 to not detect the noun
+  # set the TOP_PERCENTAGE to 0.01 to detect the noun
   draw_detector_results('/tmp/detection_results.bin',
     'zPN6ec7SevU_10000_n02965783',
     'n02965783')
+
+if __name__ == '__main__':
+  show_nouns_in_videos(1)
