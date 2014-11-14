@@ -1,4 +1,11 @@
 
+'''
+Uses the Network In Network detector, the best performer on the
+ImageNet 2014 detection competition.
+
+SPP_net is faster, but making it work on Mac turned out to be difficult.
+'''
+
 from os.path import join, dirname, abspath
 from os import system
 
@@ -30,9 +37,16 @@ def detect(image_dir):
       image_dir)[NUM_FIRST_FRAMES_SKIPPED:N_FRAMES+1]
     f.write('\n'.join(image_filenames))
   cmd = join(ROOT, 'caffe/python/detect.py')
-  #cmd += ' --pretrained_model=../data/models/VGG_ILSVRC_19_layers.caffemodel'
-  cmd += ' --pretrained_model=data/models/bvlc_reference_caffenet.caffemodel'
-  cmd += ' --model_def=data/models/bvlc_reference_caffenet/deploy.prototxt'
+  #  pretrained_model options:
+  #    data/models/VGG_ILSVRC_19_layers.caffemodel
+  #    data/models/bvlc_reference_caffenet.caffemodel
+  #    data/models/nin_imagenet/nin_imagenet.caffemodel
+  cmd += ' --pretrained_model=data/models/nin_imagenet/nin_imagenet.caffemodel'
+  #  model_dof options:
+  #    data/models/bvlc_reference_caffenet/deploy.prototxt
+  #    data/models/nin_imagenet/solver.prototxt
+  cmd += ' --model_def=data/models/nin_imagenet/solver.prototxt'
+
   cmd += ' ' + image_filenames_txt
   # In detect.py, the .csv output
   # code is buggy, and the hdf5 gave weird uint8 prediction values, so I
