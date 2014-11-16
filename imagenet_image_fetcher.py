@@ -17,8 +17,8 @@ TODO: Use hard (difficult) negative mining by running the detector on
 these images and recording which windows the detector misclassifies as
 correct.
 
-Positive examples are the image cropped to the bounding box. No resizing
-to 256x256 is done. I let caffe do that. Note that these images (usually)
+Positive training examples are the image cropped to the bounding box.
+No resizing to 256x256 is done. I let caffe do that. Note that these images (usually)
 must be manually looked at to select a subtype of the noun if you
 want a subtype. For example, I want to only collect pictures of whole eggs,
 not open eggs, so I run `filter_positive_images.py`.
@@ -32,7 +32,7 @@ from gflags import FLAGS
 from flags import set_gflags
 
 # This default wnid is for eggs
-gflags.DEFINE_string('wnid', 'n07841037',
+gflags.DEFINE_string('wnid', 'n07840804',
                      'The wordnet id of the noun in the positive images')
 
 from os.path import dirname, abspath, join, exists
@@ -42,6 +42,9 @@ ROOT = dirname(abspath(__file__))
 
 def bounding_boxes_are_available_for_this_noun(wnid):
   '''
+  It turns out the sets of bounding boxes are too incomplete for use,
+  so I wrote a Pygame to manually draw the bounding boxes.
+
   Bounding boxes are only available for the 300 synsets (out of the current
   21841 total synsets on ImageNet)
 
@@ -91,6 +94,22 @@ def download_bounding_boxes(wnid):
   You can use the following API to download the bounding boxes of a
   particular synset:
   http://www.image-net.org/api/download/imagenet.bbox.synset?wnid=[wnid]
+
+  The number of bounding boxes per image is way too small to be useful...
+  like 10% and the mapping between image and "annotation" seems unclear
+
+  And that endpoint above doesn't actually work. I emailed
+  the imagenet list about it. The endpoint that does work is:
+  "You can download all the bounding boxes available packaged in one file:
+  http://image-net.org/Annotation/Annotation.tar.gz"
+
+  I await an email to see if I'll need to write a pygame for bounding
+  the boxes. I've done it before, so it should be quick...
+
+  Well hey, if I can draw bounding boxes in six seconds per image on
+  average, it'll take two hours. I can handle that...
+  haha unfortunately for eggs, there are often several (like 20) eggs
+  per image. It takes much longer.
   '''
   pass
 
@@ -112,7 +131,4 @@ def all_wnids():
 
 if __name__ == '__main__':
   set_gflags()
-  if not bounding_boxes_are_available_for_this_noun(FLAGS.wnid):
-    print 'Bounding boxes are not avialable for that noun.'
-  else:
-    download_images(FLAGS.wnid)
+  download_images(FLAGS.wnid)

@@ -1,6 +1,6 @@
 '''
 This script trains the neural net on the train and test set created
-by imagenet_image_fetcher.py
+by create_data_splits.py
 
 This github issue is wildly helpful:
   https://github.com/BVLC/caffe/issues/550
@@ -15,7 +15,7 @@ from gflags import FLAGS
 from flags import set_gflags
 
 # This default wnid is for eggs
-gflags.DEFINE_string('wnid', 'n07841037',
+gflags.DEFINE_string('wnid', 'n07840804',
                      'The wordnet id of the noun in the positive images')
 
 from os.path import join
