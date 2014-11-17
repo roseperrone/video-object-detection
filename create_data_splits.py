@@ -14,6 +14,17 @@ Else:
   rename the `all` dir to `train/positive`
 
 Then run this script.
+
+As in the "Network In Network" paper, splitting of training and vaidation
+datasets follows:
+Ian J Goodfellow, David Warde-Farley, Mehdi Mirza, Aaron Courville,
+and Yoshua Bengio. Maxout networks. arXiv preprint arXiv:1302.4389, 2013.
+
+The negative examples are randomly drawn from other imagenet categories.
+There are currently 21841 imagenet categories.
+TODO: Use hard (difficult) negative mining by running the detector on
+these images and recording which windows the detector misclassifies as
+correct.
 '''
 
 import gflags
@@ -23,7 +34,13 @@ from flags import set_gflags
 # This default wnid is for eggs
 gflags.DEFINE_string('wnid', 'n07840804',
                      'The wordnet id of the noun in the positive images')
-
+gflags.DEFINE_boolean('skip_pos', False, 'Set to True to generate only the'
+                      ' negative images and category files, and skip moving'
+                      ' the positive images. Useful if this'
+                      ' script was interrupted during negative image '
+                      ' generation.')
+# I have 2281 cropped images for n07840804 (eggs) (I didn't draw bounding
+# boxes for all of the images).
 # This ratio default is used in
 # http://people.csail.mit.edu/torralba/publications/datasets_cvpr11.pdf
 # "For detection the number of negatives is naturally much larger and
@@ -38,18 +55,20 @@ gflags.DEFINE_integer('negative_to_positive_test_ratio', 100, '')
 # (validation, really) set to train hyperparamaters, just to judge accuracy.
 # Otherwise I'd use 6, as in the
 # Maxout Networks paper: arxiv.org/pdf/1302.4389v4.pdf
-gflags.DEFINE_integer('train_to_test_ratio', 20, '')
+gflags.DEFINE_integer('train_to_test_ratio', 40, '')
 
 import sys
-import glob
-from os.path import dirname, abspath, join, listdir, exists
+from glob import glob
+from os.path import dirname, abspath, join, exists
+from os import listdir, system
 
-from imagenet_image_fetcher import get_images, download_bounding_boxes
+from imagenet_image_fetcher import (download_images, download_bounding_boxes,
+                                    download_negative_images)
 
 ROOT = dirname(abspath(__file__))
 
 
-def create_train_and_test_splits()
+def create_train_and_test_splits():
   '''
   Directories created in data/imagenet/<wnid>/images:
     train/positive
@@ -79,14 +98,10 @@ def create_train_and_test_splits()
   negative_images_train_dir = join(images_dir, 'train/negative')
   positive_images_test_dir = join(images_dir, 'test/positive')
   negative_images_test_dir = join(images_dir, 'test/negative')
-
-  if not exists(positive_images_train_dir):
-    print 'The positive_images_train_dir must be populated with images'
-    sys.exit(1)
-
-  system('mkdir -p ', negative_images_train_dir)
-  system('mkdir -p ', positive_images_test_dir)
-  system('mkdir -p ', negative_images_test_dir)
+  system('mkdir -p ' + positive_images_train_dir)
+  system('mkdir -p ' + negative_images_train_dir)
+  system('mkdir -p ' + positive_images_test_dir)
+  system('mkdir -p ' + negative_images_test_dir)
 
   cropped_dir = join(images_dir, 'cropped')
   if exists(cropped_dir):
@@ -94,8 +109,12 @@ def create_train_and_test_splits()
   else:
     all_positive_images_dir = join(images_dir, 'all')
 
+  if not exists(all_positive_images_dir):
+    print 'The positive_images_train_dir must be populated with images'
+    sys.exit(1)
+
   num_positive_images = \
-    len(glob.glob(all_positive_images_dir, '*.[Jj][Pp][Gg]'))
+    len(glob(join(all_positive_images_dir, '*.[Jj][Pp][Gg]')))
 
   num_positive_test_images = \
     int(num_positive_images / (1 + FLAGS.train_to_test_ratio))
@@ -108,22 +127,20 @@ def create_train_and_test_splits()
   num_negative_test_images = \
     num_positive_test_images * FLAGS.negative_to_positive_test_ratio
 
-  num_moved = 0
-  for name in listdir(all_positive_images_dir):
-    system('mv ' + join(all_positive_images_dir, name) + ' ' \
-           positive_images_train_dir)
-    num_moved += 1
-    if num_moved == num_positive_train_images:
-      break
+  if not FLAGS.skip_pos:
+    num_moved = 0
+    for name in listdir(all_positive_images_dir):
+      if num_moved < num_positive_train_images:
+        system('cp ' + join(all_positive_images_dir, name) + ' ' + \
+               positive_images_train_dir)
+      else:
+        system('cp ' + join(all_positive_images_dir, name) + ' ' + \
+               positive_images_test_dir)
+      num_moved += 1
 
-  for name in listdir(all_positive_images_dir):
-    system('mv ' + join(all_positive_images_dir, name) + ' ' \
-           positive_images_test_dir)
-
-
-  get_negative_images(FLAGS.wnid, num_negative_train_images,
+  download_negative_images(FLAGS.wnid, num_negative_train_images,
                       negative_images_train_dir)
-  get_negative_images(FLAGS.wnid, num_negative_test_images,
+  download_negative_images(FLAGS.wnid, num_negative_test_images,
                       negative_images_test_dir)
 
   create_category_files('train')

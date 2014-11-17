@@ -1,42 +1,14 @@
 '''
-First, search ImageNet for the noun. Click on Downloads,
-and then click Download URLs of images in the synset. Copy this text to
-data/image-urls/<wnid>.txt
-
-Then run `python imagenet_image_fetcher.py <wnid>`. You'll be able to find
-the fetched images in data/imagenet-images/<wnid>/
-
-As in the "Network In Network" paper, splitting of training and vaidation
-datasets follows:
-Ian J Goodfellow, David Warde-Farley, Mehdi Mirza, Aaron Courville,
-and Yoshua Bengio. Maxout networks. arXiv preprint arXiv:1302.4389, 2013.
-
-The negative examples are randomly drawn from other imagenet categories.
-There are currently 21841 imagenet categories.
-TODO: Use hard (difficult) negative mining by running the detector on
-these images and recording which windows the detector misclassifies as
-correct.
-
-Positive training examples are the image cropped to the bounding box.
-No resizing to 256x256 is done. I let caffe do that. Note that these images (usually)
-must be manually looked at to select a subtype of the noun if you
-want a subtype. For example, I want to only collect pictures of whole eggs,
-not open eggs, so I run `filter_positive_images.py`.
-
-Perhaps a better method is to use windows from positive images that do not
-contain the image. The negative-mining method will change when the time comes.
+Utilities for downloading ImageNet images.
 '''
 
-import gflags
-from gflags import FLAGS
-from flags import set_gflags
+from cropping_utils import crop_image_randomly
 
-# This default wnid is for eggs
-gflags.DEFINE_string('wnid', 'n07840804',
-                     'The wordnet id of the noun in the positive images')
-
-from os.path import dirname, abspath, join, exists
+from random import shuffle, randint
+from os.path import dirname, abspath, join, exists, basename
+from glob import glob
 from os import system
+
 
 ROOT = dirname(abspath(__file__))
 
@@ -58,15 +30,79 @@ def bounding_boxes_are_available_for_this_noun(wnid):
   with open(bbox_synset_list_filename) as f:
    return wnid + '\n' in list(f)
 
-def get_one_random_image(wnid, target_dir):
+# TODO multithread this because it takes forever
+def download_negative_images(wnid, count, target_dir):
+  '''
+  Downloads `count` random images from imagenet that have any wnid other than
+  `wnid', and place them in `target_dir`.
+  Each image is renamed:
+    <original wnid>_<original image name>
+
+  The negative images are cropped by a random crop_box in
+  `imagenet/<wnid>/bounding_boxes.csv`, because the positive images
+  are, and are therefore often more zoomed-in than the typical
+  imagenet photo.
+  '''
+  target_count = count
+  system('mkdir -p ' + target_dir)
+  wnids = all_wnids()
+  shuffle(wnids)
+  wnids.remove(wnid)
+  # images may be in the dir from a previous run. Keep 'em.
+  count -= len(glob(join(target_dir, '*.[Jj][Pp][Gg]')))
+  tmp = '/tmp/negative_image'
+
+  while count > 0:
+    for id in wnids:
+      system('rm -rf ' + tmp)
+      system('mkdir -p ' + tmp)
+      download_one_random_image(id, tmp)
+      one_or_zero_filenames = glob(join(tmp, '*.[Jj][Pp][Gg]'))
+      if len(one_or_zero_filenames) == 0:
+        continue
+      name = basename(one_or_zero_filenames[0])
+      if crop_image_randomly(wnid, join(tmp, name),
+                            join(target_dir, id + '_' + name)):
+        count -= 1
+        print '>>>>>', count, '/', target_count
+        if count == 0:
+          break
+
+def download_one_random_image(wnid, target_dir):
   '''
   Downloads a random image identified by the synset id, and places it in
   `target_dir`
 
   Given the wnid of a synset, the URLs of its images can be obtained at
   http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=[wnid]
+
+  If the image
   '''
-  pass
+  system('mkdir -p /tmp/image-urls')
+  wnid_list_filename = join('/tmp/image-urls', wnid + '.txt')
+  if not exists(wnid_list_filename):
+    system('wget http://www.image-net.org/api/text/'
+           'imagenet.synset.geturls?wnid=' + wnid + ' -O ' + \
+           wnid_list_filename)
+  image_url = get_random_url(wnid_list_filename)
+  system('wget ' + image_url + ' --directory-prefix=' + target_dir)
+
+def get_random_url(filename):
+  '''
+  Arguments:
+    filename: identifies a file that contains a list of urls
+  Returns:
+    a random url in the file
+  '''
+  with open(filename) as f:
+    lines = [line for line in list(f) if len(line) > 4] # skip empty lines
+    if len(lines) == 0:
+      import pdb; pdb.set_trace()
+    try:
+      return lines[randint(0, len(lines) - 1)][:-2] # strip trailing '\r\n'
+    except IndexError as e:
+      print e
+      import pdb; pdb.set_trace()
 
 def download_images(wnid):
   '''
@@ -113,13 +149,7 @@ def download_bounding_boxes(wnid):
   '''
   pass
 
-def download_negative_images(wnid, count, target_dir):
-  '''
-  Downloads `count` random images from imagenet that have any wnid other than
-  `wnid', and place them in `target_dir`.
-  '''
-  pass
-
+ALL_WNIDS = []
 def all_wnids():
   '''
   Returns all wnids for which ImageNet has images
@@ -127,8 +157,14 @@ def all_wnids():
   The list of all wordnet ids (which identify the synsets) is at:
   http://www.image-net.org/api/text/imagenet.synset.obtain_synset_list
   '''
-  pass
+  if len(ALL_WNIDS) > 0:
+    return ALL_WNIDS
 
-if __name__ == '__main__':
-  set_gflags()
-  download_images(FLAGS.wnid)
+  tmp = '/tmp/wnids.txt'
+  system('wget http://www.image-net.org/api/text/'
+         'imagenet.synset.obtain_synset_list -O ' + tmp)
+  with open(tmp) as f:
+    for line in f:
+      if len(line) > 2: # skip the last two empty lines
+        ALL_WNIDS.append(line[:-1]) # strip trailing '\n'
+  return ALL_WNIDS
