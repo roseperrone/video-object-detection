@@ -73,7 +73,7 @@ def compute_image_mean():
   system('/Users/rose/home/video-object-detection/caffe/.build_release/tools/'
          'compute_image_mean.bin '
          join(WNID_DIR, 'ilsvrc12_train_lmdb '),
-         'imagenet_mean.binaryproto '
+         'image_mean.binaryproto '
          'lmdb')
 
 if __name__ == '__main__':
@@ -83,3 +83,5 @@ if __name__ == '__main__':
   system('mkdir -p ' + join(WNID_DIR, 'aux'))
   create_lmdbs()
   compute_image_mean()
+  system('mkdir -p ' + join(WNID_DIR, 'snapshots'))
+

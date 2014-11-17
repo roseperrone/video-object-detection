@@ -10,7 +10,7 @@ optional:
   draw_bounding_boxes.py and then bounded_box_cropper.py
 create_data_splits.py
 prepare_data.py
-Manually create the prototxt files now. See prototxt_generation_instructions.md
+Manually create the prototxt files now. See prototxt_generation_instructions.txt
 ...
 
 ```

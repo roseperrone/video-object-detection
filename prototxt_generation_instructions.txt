@@ -1,0 +1,22 @@
+
+Use absolute paths for simplicity.
+
+First, copy the model's train_val.prototxt to data/imagenet/<wnid_dir>/aux
+Then change the files for each "source:" and "mean_file:" line to the lmbd
+files and image mean created by prepare_data.py.
+
+Copy the model's solver.prototxt to data/imagenet/<wnid_dir>/aux
+Change the "net:" path to the path to the train_val.prototxt you just created.
+Change the "snapshot_prefix:" to data/imagenet/<wnid_dir>/snapshots
+Change the "sorver_mode:" to CPU
+
+The deploy.prototxt appears to be difficult to generate. NIN unfortunately
+doesn't provide one. See https://github.com/BVLC/caffe/issues/1245
+and https://github.com/BVLC/caffe/issues/261
+
+
+## Some reference documentation
+  This github issue is wildly helpful:
+    https://github.com/BVLC/caffe/issues/550
+  This documentation is good too:
+    http://caffe.berkeleyvision.org/gathered/examples/imagenet.html
