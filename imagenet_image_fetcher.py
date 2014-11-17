@@ -1,5 +1,9 @@
 '''
 Utilities for downloading ImageNet images.
+
+FIXME: During the negative images download, images are sometimes
+       (about 1% of downloaded images) downloaded to ROOT. I don't know why.
+       The images are not corrupt. For now, I just delete them.
 '''
 
 from cropping_utils import crop_image_randomly
@@ -86,7 +90,9 @@ def download_one_random_image(wnid, target_dir):
     system('wget http://www.image-net.org/api/text/'
            'imagenet.synset.geturls?wnid=' + wnid + ' -O ' + \
            wnid_list_filename)
-  image_url = get_random_url(wnid_list_filename)
+  image_url = None
+  while image_url is None:
+    image_url = get_random_url(wnid_list_filename)
   command = Command('wget ' + image_url + ' --directory-prefix=' + target_dir)
   command.run(timeout=2)
 
@@ -96,12 +102,12 @@ def get_random_url(filename):
   Arguments:
     filename: identifies a file that contains a list of urls
   Returns:
-    a random url in the file
+    a random url in the file if filename contains urls, else returns None
   '''
   with open(filename) as f:
     lines = [line for line in list(f) if len(line) > 4] # skip empty lines
     if len(lines) == 0:
-      import pdb; pdb.set_trace()
+      return None
     try:
       return lines[randint(0, len(lines) - 1)][:-2] # strip trailing '\r\n'
     except IndexError as e:

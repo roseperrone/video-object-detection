@@ -71,10 +71,12 @@ ROOT = dirname(abspath(__file__))
 def create_train_and_test_splits():
   '''
   Directories created in data/imagenet/<wnid>/images:
-    train/positive
-    train/negative
-    test/positive
-    test/negative
+    train-positive
+    train-negative
+    test-positive
+    test-negative
+    train # contains links to all images in train-positive and train-negative
+    test # contains links to all images in test-positive and test-negative
 
   This function does not preprocess the images. I let caffe resize the
   images to 256x256.
@@ -88,20 +90,24 @@ def create_train_and_test_splits():
   where picture-foo belongs to category 0 and picture-foo1 belongs
   to category 1 (I call category 1 the positive category).
 
-  These two files are created in data/imagenet/<wnid>/image-categories:
+  These two files are created in data/imagenet/<wnid>:
     train.txt
     test.txt
   '''
   wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
   images_dir = join(wnid_dir, 'images')
-  positive_images_train_dir = join(images_dir, 'train/positive')
-  negative_images_train_dir = join(images_dir, 'train/negative')
-  positive_images_test_dir = join(images_dir, 'test/positive')
-  negative_images_test_dir = join(images_dir, 'test/negative')
+  positive_images_train_dir = join(images_dir, 'train-positive')
+  negative_images_train_dir = join(images_dir, 'train-negative')
+  positive_images_test_dir = join(images_dir, 'test-positive')
+  negative_images_test_dir = join(images_dir, 'test-negative')
+  train_dir = join(images_dir, 'train')
+  test_dir = join(images_dir, 'test')
   system('mkdir -p ' + positive_images_train_dir)
   system('mkdir -p ' + negative_images_train_dir)
   system('mkdir -p ' + positive_images_test_dir)
   system('mkdir -p ' + negative_images_test_dir)
+  system('mkdir -p ' + train_dir)
+  system('mkdir -p ' + test_dir)
 
   cropped_dir = join(images_dir, 'cropped')
   if exists(cropped_dir):
@@ -143,6 +149,16 @@ def create_train_and_test_splits():
   download_negative_images(FLAGS.wnid, num_negative_test_images,
                       negative_images_test_dir)
 
+  print 'All done!'
+  import pdb; pdb.set_trace()
+  # ImageNet expects all train images to be in one directory,
+  # and likewise the test images.
+  # I wait until now to do it for debugging and visualization purposes
+  link_positive_and_negative_images_to_one_dir('train')
+  import pdb; pdb.set_trace()
+  link_positive_and_negative_images_to_one_dir('test')
+  import pdb; pdb.set_trace()
+
   create_category_files('train')
   create_category_files('test')
 
@@ -153,11 +169,22 @@ def create_category_files(stage):
   wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
   positive_dir = join(wnid_dir, stage, 'positive')
   negative_dir = join(wnid_dir, stage, 'negative')
-  with open(join(wnid_dir, 'image-categories/' + stage + '.txt'), 'w') as f:
+  with open(join(wnid_dir, stage + '.txt'), 'w') as f:
     for name in listdir(positive_dir):
       f.write(join(positive_dir, name) + ' 1\n')
     for name in listdir(negative_dir):
       f.write(join(negative_dir, name) + ' 0\n')
+
+def link_positive_and_negative_images_to_one_dir(stage)
+  images_dir = join(ROOT, 'data/imagenet', FLAGS.wnid, 'images')
+  positive_dir = join(images_dir, stage + '-positive')
+  negative_dir = join(images_dir, stage + '-negative')
+  dst_dir = join(images_dir, stage)
+  for name in listdir(positive_dir):
+    system('ln -s ' + join(positive_dir, name) + dst_dir)
+  for name in listdir(negative_dir):
+    system('ln -s ' + join(negative_dir, name) + dst_dir)
+
 
 if __name__ == '__main__':
   set_gflags()
