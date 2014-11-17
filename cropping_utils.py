@@ -69,13 +69,13 @@ def crop_image_randomly(positive_wnid, src_image_filename, dst_image_filename):
     else:
       box_index = 1 + 4*randint(0, (len(row) - 1)/4 - 1)
     try:
-      image.crop(get_crop_box(row, box_index, width, height)
-        ).save(dst_image_filename)
+      crop_box = get_crop_box(row, box_index, width, height)
+      image.crop(crop_box).save(dst_image_filename)
     except IOError as e:
       # A workaround for "IOError: cannot write mode P as JPEG"
       try:
-        image.crop(get_crop_box(row, box_index, width, height)
-          ).convert('RGB').save(dst_image_filename)
+        crop_box = get_crop_box(row, box_index, width, height)
+        image.crop(crop_box).convert('RGB').save(dst_image_filename)
       except SystemError as e:
         log_error(e, width, height, crop_box)
         return False
