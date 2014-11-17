@@ -8,6 +8,7 @@ from random import shuffle, randint
 from os.path import dirname, abspath, join, exists, basename
 from glob import glob
 from os import system
+import subprocess, threading
 
 
 ROOT = dirname(abspath(__file__))
@@ -44,15 +45,16 @@ def download_negative_images(wnid, count, target_dir):
   imagenet photo.
   '''
   target_count = count
+  count = 0
   system('mkdir -p ' + target_dir)
   wnids = all_wnids()
   shuffle(wnids)
   wnids.remove(wnid)
   # images may be in the dir from a previous run. Keep 'em.
-  count -= len(glob(join(target_dir, '*.[Jj][Pp][Gg]')))
+  count += len(glob(join(target_dir, '*.[Jj][Pp][Gg]')))
   tmp = '/tmp/negative_image'
 
-  while count > 0:
+  while count < target_count:
     for id in wnids:
       system('rm -rf ' + tmp)
       system('mkdir -p ' + tmp)
@@ -63,9 +65,9 @@ def download_negative_images(wnid, count, target_dir):
       name = basename(one_or_zero_filenames[0])
       if crop_image_randomly(wnid, join(tmp, name),
                             join(target_dir, id + '_' + name)):
-        count -= 1
+        count += 1
         print '>>>>>', count, '/', target_count
-        if count == 0:
+        if count >= target_count:
           break
 
 def download_one_random_image(wnid, target_dir):
@@ -85,7 +87,9 @@ def download_one_random_image(wnid, target_dir):
            'imagenet.synset.geturls?wnid=' + wnid + ' -O ' + \
            wnid_list_filename)
   image_url = get_random_url(wnid_list_filename)
-  system('wget ' + image_url + ' --directory-prefix=' + target_dir)
+  command = Command('wget ' + image_url + ' --directory-prefix=' + target_dir)
+  command.run(timeout=2)
+
 
 def get_random_url(filename):
   '''
@@ -168,3 +172,26 @@ def all_wnids():
       if len(line) > 2: # skip the last two empty lines
         ALL_WNIDS.append(line[:-1]) # strip trailing '\n'
   return ALL_WNIDS
+
+# From http://stackoverflow.com/questions/1191374/subprocess-with-timeout
+class Command(object):
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.process = None
+
+    def run(self, timeout):
+        def target():
+            self.process = subprocess.Popen(self.cmd, shell=True)
+            self.process.communicate()
+
+        thread = threading.Thread(target=target)
+        thread.start()
+
+        thread.join(timeout)
+        if thread.is_alive():
+            print '\n////////////////////////'
+            print '  Terminating process'
+            print '////////////////////////\n'
+            self.process.terminate()
+            thread.join()
+        print self.process.returncode
