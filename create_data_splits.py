@@ -175,7 +175,7 @@ def create_category_files(stage):
     for name in listdir(negative_dir):
       f.write(join(negative_dir, name) + ' 0\n')
 
-def link_positive_and_negative_images_to_one_dir(stage)
+def link_positive_and_negative_images_to_one_dir(stage):
   images_dir = join(ROOT, 'data/imagenet', FLAGS.wnid, 'images')
   positive_dir = join(images_dir, stage + '-positive')
   negative_dir = join(images_dir, stage + '-negative')

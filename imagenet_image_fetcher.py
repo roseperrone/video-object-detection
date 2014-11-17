@@ -125,11 +125,11 @@ def download_images(wnid):
   Given the wnid of a synset, the URLs of its images can be obtained at
   http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=[wnid]
   '''
-  images_dir = join(ROOT, 'data/imagenet', FLAGS.wnid, 'images/all')
+  images_dir = join(ROOT, 'data/imagenet', wnid, 'images/all')
   system('mkdir -p ' + images_dir)
   tmp = '/tmp/image_urls.txt'
   system('wget http://www.image-net.org/api/text/'
-         'imagenet.synset.geturls?wnid=' + FLAGS.wnid + ' -O ' + tmp)
+         'imagenet.synset.geturls?wnid=' + wnid + ' -O ' + tmp)
   with open(tmp) as f:
     for line in f:
       image_url = line[:-2] # strip trailing '\r\n'
