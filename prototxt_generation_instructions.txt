@@ -2,8 +2,10 @@
 Use absolute paths for simplicity.
 
 First, copy the model's train_val.prototxt to data/imagenet/<wnid_dir>/aux
-Then change the files for each "source:" and "mean_file:" line to the lmbd
+Change the files for each "source:" and "mean_file:" line to the lmbd
 files and image mean created by prepare_data.py.
+Find the last layer that contains a "num_output" field and change that to
+the number of categories (in my case, two: one positive, one negative).
 
 Copy the model's solver.prototxt to data/imagenet/<wnid_dir>/aux
 Change the "net:" path to the path to the train_val.prototxt you just created.
@@ -14,9 +16,37 @@ The deploy.prototxt appears to be difficult to generate. NIN unfortunately
 doesn't provide one. See https://github.com/BVLC/caffe/issues/1245
 and https://github.com/BVLC/caffe/issues/261
 
+Copy this to a new file called deploy.prototxt:
 
-## Some reference documentation
-  This github issue is wildly helpful:
-    https://github.com/BVLC/caffe/issues/550
-  This documentation is good too:
-    http://caffe.berkeleyvision.org/gathered/examples/imagenet.html
+```
+name: "<the name from train_val.prototxt>"
+input: "data"
+input_dim: 10
+input_dim: 3
+input_dim: 227
+input_dim: 227
+```
+
+Append to that all layers in train_val.prototxt.
+Delete the first few layers that don't have a "bottom" field.
+Delete all pramaters that have to do exclusively with learning.
+e.g.:
+  - blobs_lr
+  - weight_decay
+  - weight_filler
+  - bias_filler
+Delete the "accuracy" layer and any layer after it (probably the softmax)
+Append to the file this final layer:
+
+```
+# R-CNN classification layer made from R-CNN ILSVRC13 SVMs.
+layers {
+  name: "fc-rcnn"
+  type: INNER_PRODUCT
+  bottom: "fc7"
+  top: "fc-rcnn"
+  inner_product_param {
+    num_output: <change this to the number of categories>
+  }
+}
+```
