@@ -12,11 +12,19 @@ on my macbook.
 Copy the model's solver.prototxt to data/imagenet/<wnid_dir>/aux
 Change the "net:" path to the path to the train_val.prototxt you just created.
 Change the "snapshot_prefix:" to data/imagenet/<wnid_dir>/snapshots
-Change the "sorver_mode:" to CPU
-
-The deploy.prototxt appears to be difficult to generate. NIN unfortunately
-doesn't provide one. See https://github.com/BVLC/caffe/issues/1245
-and https://github.com/BVLC/caffe/issues/261
+Change the "server_mode:" to CPU
+Change the "snapshot:" to 100. On my macbook, it takes 3 minutes per 20
+iterations, so this produces one snapshot per 15 min. On a K40 machine
+training the bvlc_reference_caffenet, training the
+bvlc_refference_caffenet on 1000 ImageNet categories takes 26 seconds per
+20 iterations, which is ~5.2 ms per image, so I think they're training on about
+5100 images. I'm training on 19500 images (there are 7 times as many
+negative images as positive images)
+Change the "max_iter" to 1000. (this is 45000 for NIN, but that would take
+me 112 hours, which is 4.7 days). This is the same as test_iter. It's
+annoying that the test is also performed on an untrained network, because
+that takes 70 minutes, and just tells us the ratio of our positive to negative
+images.
 
 Copy this to a new file called deploy.prototxt:
 
@@ -52,3 +60,7 @@ layers {
   }
 }
 ```
+
+References for generating deploy.prototxt:
+  https://github.com/BVLC/caffe/issues/1245
+  https://github.com/BVLC/caffe/issues/261
