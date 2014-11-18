@@ -8,11 +8,6 @@ TOP_PERCENTAGE = 0.005
 # for these queries
 QUERIES_AND_NOUNS = {
   'why eat bananas': ['banana'],
-  # egg is not present in the 1000 ImageNet categories
-  'how to hard boil an egg': ['stove'],
-  'how to make scrambled eggs': ['stove', 'skillet'],
-  'how to cook an omelet': ['stove', 'skillet'],
-  'how to poach an egg': ['stove'],
   #'how to make jello shots', ['measuring cup'],
   'how to make french toast': ['skillet', 'mixing bowl', 'stove'],
   'how to make pancakes': ['skillet', 'mixing bowl', 'stove'],
@@ -29,6 +24,13 @@ QUERIES_AND_NOUNS = {
   #'how to tie a tie': ['Windsor tie'],
 }
 
+EGG_QUERIES = [
+  'how to hard boil an egg',
+  'how to make scrambled eggs',
+  'how to cook an omelet',
+  'how to poach an egg'
+]
+
 # The number of frames per video in which detect the noun
 # (to be removed when parameters and models are improved)
 N_FRAMES = 7
@@ -38,4 +40,4 @@ N_FRAMES = 7
 NUM_FIRST_FRAMES_SKIPPED = 1
 
 # caffe prints a lot
-HUSH_CAFFE = True
+HUSH_CAFFE = False

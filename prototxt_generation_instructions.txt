@@ -13,8 +13,8 @@ Copy the model's solver.prototxt to data/imagenet/<wnid_dir>/aux
 Change the "net:" path to the path to the train_val.prototxt you just created.
 Change the "snapshot_prefix:" to data/imagenet/<wnid_dir>/snapshots
 Change the "server_mode:" to CPU
-Change the "snapshot:" to 100. On my macbook, it takes 3 minutes per 20
-iterations, so this produces one snapshot per 15 min. On a K40 machine
+Change the "snapshot:" to 200. On my macbook, it takes 3 minutes per 20
+iterations, so this produces one snapshot per half hour. On a K40 machine
 training the bvlc_reference_caffenet, training the
 bvlc_refference_caffenet on 1000 ImageNet categories takes 26 seconds per
 20 iterations, which is ~5.2 ms per image, so I think they're training on about
@@ -53,13 +53,15 @@ Append to the file this final layer:
 layers {
   name: "fc-rcnn"
   type: INNER_PRODUCT
-  bottom: "fc7"
+  bottom: <name of layer right above this one>
   top: "fc-rcnn"
   inner_product_param {
     num_output: <change this to the number of categories>
   }
 }
 ```
+In the last layer before the R-CNN layer that contains a "num_output" field,
+change that value to the number of categories (in my case, 2).
 
 References for generating deploy.prototxt:
   https://github.com/BVLC/caffe/issues/1245

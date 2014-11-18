@@ -15,16 +15,24 @@ from performance import timeit
 
 ROOT = dirname(abspath(__file__))
 
-def get_prepared_images(url, ms_between_frames, video_filename):
+def get_prepared_images(url, ms_between_frames, video_filename, wnid=None):
   '''
   Returns:
     The  directory that contains the image frames.
     The image filenames take the format:
       <milliseconds_into_the_video>.jpg
-    The directory name is stored in data/images and takes the format:
+    If wnid is None, the directory is stored in data/images.
+    Else, the directory is stored in data/imagenet/<wnid>/annotated
+    The image dir takes the format:
       <sanitized video url>_<milliseconds_between_frames>
   '''
-  image_dir = image_frames_dir(url, ms_between_frames)
+  video_id = re.match('.*v=(.*$)', url).groups()[0]
+  if wnid is None:
+    image_dir = join(ROOT, 'data/images',
+                     video_id + '_' + str(ms_between_frames))
+  else:
+    image_dir = join(ROOT, 'data/imagenet', wnid, 'prepared',
+                     video_id + '_' + str(ms_between_frames))
   if exists(image_dir):
     return image_dir
   system('mkdir -p ' + image_dir)
@@ -47,14 +55,6 @@ def _prepare_images(video_filename, image_dir, ms_between_frames):
     image_count += 1
     print image_count, '/', frame_count/step
   return image_dir
-
-def image_frames_dir(url, ms_between_frames):
-  '''
-  Generates the image frames directory name unique to the video's url and
-  the frame rate in milliseconds.
-  '''
-  video_id = re.match('.*v=(.*$)', url).groups()[0]
-  return join(ROOT, 'data/images', video_id + '_' + str(ms_between_frames))
 
 def prepare_image(bgr_image):
   'Resizes the images to 256x256'

@@ -16,7 +16,9 @@ from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 ROOT = dirname(abspath(__file__))
 
 @timeit
-def detect(image_dir, output_filename):
+def detect(image_dir,
+      caffemodel='data/models/data/models/bvlc_reference_caffenet.caffemodel',
+      deploy_prototxt='data/models/bvlc_reference_caffenet/deploy.prototxt'):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
   (the generator of the windows over which the classifier is run),
@@ -37,15 +39,8 @@ def detect(image_dir, output_filename):
       image_dir)[NUM_FIRST_FRAMES_SKIPPED:N_FRAMES+1]
     f.write('\n'.join(image_filenames))
   cmd = join(ROOT, 'caffe/python/detect.py')
-  #  pretrained_model options:
-  #    data/models/VGG_ILSVRC_19_layers.caffemodel
-  #    data/models/bvlc_reference_caffenet.caffemodel
-  #    data/models/nin_imagenet/nin_imagenet.caffemodel
-  cmd += ' --pretrained_model=data/models/nin_imagenet/nin_imagenet.caffemodel'
-  #  model_def options:
-  #    data/models/bvlc_reference_caffenet/deploy.prototxt
-  #    data/models/nin_imagenet/solver.prototxt
-  cmd += ' --model_def=data/models/nin_imagenet/solver.prototxt'
+  cmd += ' --pretrained_model=' + caffemodel
+  cmd += ' --model_def=' + deploy_prototxt
 
   cmd += ' ' + image_filenames_txt
   # In detect.py, the .csv output

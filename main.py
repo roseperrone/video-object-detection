@@ -6,12 +6,13 @@
   You can find information about this neural net here:
     https://gist.github.com/ksimonyan/3785162f95cd2d5fee77#file-readme-md
 '''
-from os.path import dirname, abspath, basename
+from os.path import dirname, abspath, basename, join
 from PIL import Image
 import numpy as np
 from datetime import datetime
 
-from video_id_fetcher import get_noun_ids_and_video_ids
+from video_id_fetcher import (get_noun_ids_and_video_ids,
+                              get_egg_video_ids)
 from video_fetcher import video_url, fetch_video
 from image_utils import get_prepared_images
 from classifier import classify
@@ -21,8 +22,10 @@ from image_utils import show_image
 
 from config import TOP_PERCENTAGE
 
+ROOT = dirname(abspath(__file__))
 
-def where_is_noun_in_video(video_id, noun_id):
+
+def where_is_noun_in_video(video_id, wnid):
   '''
   Returns:
     a list of tuples of video segments in which that noun appears,
@@ -31,13 +34,14 @@ def where_is_noun_in_video(video_id, noun_id):
   # TODO change 10,000 to 1,000 after the full pipeline works
   url = video_url(video_id)
   video_filename = fetch_video(url)
-  image_dir = get_prepared_images(url, 10000, video_filename)
-  predictions_filename = detect(image_dir)
+  image_dir = get_prepared_images(url, 10000, video_filename, wnid)
+  wnid_dir = join(ROOT, 'data/imagenet', wnid)
+  #predictions_filename = detect(image_dir,
+  #  join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
+  #  join(wnid_dir, 'aux/deploy.prototxt'))
+  predictions_filename = '/tmp/detection_results.bin'
   draw_detector_results(predictions_filename,
-    '_'.join([basename(image_dir),
-              noun_id,
-              str(int(1000 * TOP_PERCENTAGE))]),
-    noun_id)
+    join(ROOT, 'data/imagenet', wnid, 'annotated', basename(image_dir)))
 
 def show_nouns_in_videos(num_videos_per_noun):
   '''
@@ -56,14 +60,14 @@ def show_nouns_in_videos(num_videos_per_noun):
                          ]))
         f.flush()
 
-def test_classification(image_filename, noun_id):
+def test_classification(image_filename, wnid):
   '''
   Classifies one BGR image and shows the results
   '''
   # TODO this is out of date
   predictions = classify(image_filename)
   image = np.asarray(Image.open(
-    draw_classifier_results(predictions, noun_id, image_filename)))
+    draw_classifier_results(predictions, wnid, image_filename)))
   Image.fromarray(image).save(
     'data/labelled-test-images/' + basename(image_filename))
   show_image(image)
@@ -90,7 +94,9 @@ def test_image_annotator():
     'n02965783')
 
 def test_detector_on_eggs():
-  where_is_noun_in_video(video_id, noun_id)
+  video_ids = get_egg_video_ids(10)
+  for video_id in video_ids:
+    where_is_noun_in_video(video_id, 'n07840804')
 
 if __name__ == '__main__':
-  show_nouns_in_videos(1)
+  test_detector_on_eggs()
