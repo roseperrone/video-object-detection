@@ -1,6 +1,6 @@
 # Simple object detection in YouTube videos.
 
-## Order in which to use the scripts to train a net on a single noun
+## To train a net on a single noun, run these scripts
 
 ```
 fetch_positive_images.py
@@ -14,8 +14,7 @@ Manually create the prototxt files now. See prototxt_generation_instructions.txt
 train.py
 ```
 
-
-## Order in which to use the scripts to test a net on youtube videos to detect a single noun
+## To run the net on youtube videos to produce frames with the detected noun drawn in a bounding box, run these scripts
 
 ```
 main.py
