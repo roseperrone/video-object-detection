@@ -45,9 +45,12 @@ gflags.DEFINE_boolean('skip_pos', False, 'Set to True to generate only the'
 # http://people.csail.mit.edu/torralba/publications/datasets_cvpr11.pdf
 # "For detection the number of negatives is naturally much larger and
 # more diverse".
+# Note: For eggs, I didn't meet this ratio of 10, because I cut the
+# negative image downlaoding short, so I actually use a ratio of 7.6
+# (17280 negative train images)
 gflags.DEFINE_integer('negative_to_positive_train_ratio', 10, '')
 # 2000 ideally, but I'm going for speed right now:
-gflags.DEFINE_integer('negative_to_positive_test_ratio', 100, '')
+gflags.DEFINE_integer('negative_to_positive_test_ratio', 50, '')
 # The above ratio default is similar to the number of bounding boxes detected
 # via selective search for each image.
 
@@ -94,6 +97,7 @@ def create_train_and_test_splits():
     train.txt
     test.txt
   '''
+
   wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
   images_dir = join(wnid_dir, 'images')
   positive_images_train_dir = join(images_dir, 'train-positive')
@@ -149,15 +153,11 @@ def create_train_and_test_splits():
   download_negative_images(FLAGS.wnid, num_negative_test_images,
                       negative_images_test_dir)
 
-  print 'All done!'
-  import pdb; pdb.set_trace()
   # ImageNet expects all train images to be in one directory,
   # and likewise the test images.
   # I wait until now to do it for debugging and visualization purposes
   link_positive_and_negative_images_to_one_dir('train')
-  import pdb; pdb.set_trace()
   link_positive_and_negative_images_to_one_dir('test')
-  import pdb; pdb.set_trace()
 
   create_category_files('train')
   create_category_files('test')
@@ -165,29 +165,60 @@ def create_train_and_test_splits():
 def create_category_files(stage):
   '''
   `stage` is either 'train' or 'test'
+
+  The original positive images are in train-positive or test-positive.
+  The original negative images are in train-negative or test-negative.
+
+  train/ and test/ contain symlinks from both positive and negative images.
+
+  Therefore I use train and test as the filenames in the category files, but
+  I use the [train, test]-[positive-negative] directories to determine whether
+  the filename should be followed with a 0 or 1.
   '''
   wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
-  positive_dir = join(wnid_dir, stage, 'positive')
-  negative_dir = join(wnid_dir, stage, 'negative')
+  positive_dir = join(wnid_dir, 'images', stage + '-positive')
+  negative_dir = join(wnid_dir, 'images', stage + '-negative')
   with open(join(wnid_dir, stage + '.txt'), 'w') as f:
     for name in listdir(positive_dir):
-      f.write(join(positive_dir, name) + ' 1\n')
+      f.write(name + ' 1\n')
     for name in listdir(negative_dir):
-      f.write(join(negative_dir, name) + ' 0\n')
+      f.write(name + ' 0\n')
 
 def link_positive_and_negative_images_to_one_dir(stage):
+  '''
+  FIXME: do I need to sanitize the filenames? I got like 500 of these errors:
+
+  ln: 1.jpg: No such file or directory
+  ln: hemlock.jpg: No such file or directory
+  ln: littoralis_thumb.jpg: No such file or directory
+  ln: matricariifolium.JPG: No such file or directory
+  ln: phalloides-1.jpg: No such file or directory
+  ln: tomato.jpg: No such file or directory
+  ln: Kuznik.jpg: No such file or directory
+  sh: -c: line 0: syntax error near unexpected token `('
+  sh: -c: line 0: `ln -s /Users/rose/home/video-object-detection/data/imagenet/n07840804/images/train-negative/n13003522_275px-Amanita_rubescens_(2).JPG /Users/rose/home/video-object-detection/data/imagenet/n07840804/images/train/n13003522_275px-Amanita_rubescens_(2).JPG'
+  ln: DW.jpg: No such file or directory
+  ln: 21968.jpg: No such file or directory
+  ln: 3.JPG: No such file or directory
+  ln: 0.jpg: No such file or directory
+  ln: betulinus.jpg: No such file or directory
+  ln: peckii7.jpg: No such file or directory
+  ln: ovovillus.JPG: No such file or directory
+  ln: luridus.jpg: No such file or directory
+  ln: Parker.jpg: No such file or directory
+  ln: Beug.jpg: No such file or directory
+  '''
+
   images_dir = join(ROOT, 'data/imagenet', FLAGS.wnid, 'images')
   positive_dir = join(images_dir, stage + '-positive')
   negative_dir = join(images_dir, stage + '-negative')
   dst_dir = join(images_dir, stage)
   for name in listdir(positive_dir):
-    system('ln -s ' + join(positive_dir, name) + dst_dir)
+    system('ln -s ' + join(positive_dir, name) + ' ' + join(dst_dir, name))
   for name in listdir(negative_dir):
-    system('ln -s ' + join(negative_dir, name) + dst_dir)
-
+    system('ln -s ' + join(negative_dir, name) + ' ' + join(dst_dir, name))
 
 if __name__ == '__main__':
   set_gflags()
   create_train_and_test_splits()
-
 

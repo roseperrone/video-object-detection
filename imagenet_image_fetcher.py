@@ -1,9 +1,12 @@
 '''
 Utilities for downloading ImageNet images.
 
-FIXME: During the negative images download, images are sometimes
-       (about 1% of downloaded images) downloaded to ROOT. I don't know why.
-       The images are not corrupt. For now, I just delete them.
+FIXME: During the negative images download, sometimes images can't be
+       successfully downloaded, and the wget downloads a web page that
+       shows an error message to ROOT. This happens for about 1% of the
+       downloaded images. I don't know why they're downloaded to ROOT rather
+       than the `target_dir` in `download_one_random_image`.
+       For now, I just delete them.
 '''
 
 from cropping_utils import crop_image_randomly
@@ -35,7 +38,7 @@ def bounding_boxes_are_available_for_this_noun(wnid):
   with open(bbox_synset_list_filename) as f:
    return wnid + '\n' in list(f)
 
-# TODO multithread this because it takes forever
+# TODO multithread this because it takes forever. Use 2-3 threads.
 def download_negative_images(wnid, count, target_dir):
   '''
   Downloads `count` random images from imagenet that have any wnid other than

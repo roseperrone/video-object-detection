@@ -11,14 +11,14 @@ optional:
 create_data_splits.py
 prepare_data.py
 Manually create the prototxt files now. See prototxt_generation_instructions.txt
-...
-
+train.py
 ```
 
 
 ## Order in which to use the scripts to test a net on youtube videos to detect a single noun
 
 ```
-...
+main.py
+judge_predictions.py
 accuracy.py
 ```

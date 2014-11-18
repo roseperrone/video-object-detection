@@ -1,8 +1,9 @@
 '''
 The purpose of this pygame is to determine precision and recall for
-the noun detector, and to gather data to learn a function to
-determine which labels are correct, especially in light of information
-about repeated detections in an image.
+the noun detector.
+
+The images to be judged must be present in
+(when applied to frames of YouTube videos).
 
 Usage:
   Run python judge_predictions.py

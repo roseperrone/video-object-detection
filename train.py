@@ -3,14 +3,6 @@ This script trains the neural net on the train and test set created
 by create_data_splits.py using the auxiliary files created in
 prepare_data.py and the prototxt files created manually
 (see prototxt_generation_instructions.md).
-
-This github issue is wildly helpful:
-  https://github.com/BVLC/caffe/issues/550
-This documentation is good too:
-  http://caffe.berkeleyvision.org/gathered/examples/imagenet.html
-
-Usage:
-  Run python `
 '''
 
 import gflags
@@ -24,27 +16,21 @@ ROOT = dirname(abspath(__file__))
 # This default wnid is for eggs
 gflags.DEFINE_string('wnid', 'n07840804',
  'The wordnet id of the noun in the positive images')
-
-def generate_train_script():
-  pass
-
-def train():
-  pass
-
-def test():
-  pass
+gflags.DEFINE_boolean('time', False, 'Set to true if you are interested in '
+  'dissecting the runtime')
+gflags.DEFINE_string('snapshot', None, 'If training got interrupted, resume '
+  'using this snapshot, relative to aux/snapshots. Provide the name only, '
+  'not the full path.')
 
 if __name__ == '__main__':
   set_gflags()
-  global WNID_DIR
-  WNID_DIR = join(ROOT, 'data/imagenet', FLAGS.wnid)
-  if FLAGS.create_lmdbs_and_compute_image_mean:
-    system('mkdir -p ' + FLAGS.aux_dir)
-    create_lmdbs()
-    compute_image_mean()
-
-  generate_prototxt_files()
-  generate_train_script()
-  train()
-  test()
-
+  aux_dir = join(ROOT, 'data/imagenet', FLAGS.wnid, 'aux')
+  cmd = join(ROOT, 'caffe/.build_release/tools/caffe.bin')
+  if FLAGS.time:
+    cmd += ' time --model=' + join(aux_dir, 'train_val.prototxt')
+  else:
+    cmd += ' train --solver=' + join(aux_dir, 'solver.prototxt')
+    if FLAGS.snapshot is not None:
+      cmd += ' --snapshot=' + join(aux_dir, FLAGS.snapshot)
+  print cmd
+  system(cmd)

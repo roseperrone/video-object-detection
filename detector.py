@@ -16,7 +16,7 @@ from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 ROOT = dirname(abspath(__file__))
 
 @timeit
-def detect(image_dir):
+def detect(image_dir, output_filename):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
   (the generator of the windows over which the classifier is run),
@@ -42,7 +42,7 @@ def detect(image_dir):
   #    data/models/bvlc_reference_caffenet.caffemodel
   #    data/models/nin_imagenet/nin_imagenet.caffemodel
   cmd += ' --pretrained_model=data/models/nin_imagenet/nin_imagenet.caffemodel'
-  #  model_dof options:
+  #  model_def options:
   #    data/models/bvlc_reference_caffenet/deploy.prototxt
   #    data/models/nin_imagenet/solver.prototxt
   cmd += ' --model_def=data/models/nin_imagenet/solver.prototxt'

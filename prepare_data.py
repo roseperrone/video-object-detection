@@ -3,6 +3,13 @@ Run this script after running create_data_splits.py and before
 manually generating the prototxt files.
 
 This script generates create_imagenet.sh and imagenet_mean.binaryproto
+
+Make sure you delete the lmdb directories if you rerun this script.
+
+This github issue is wildly helpful:
+  https://github.com/BVLC/caffe/issues/550
+This documentation is good too:
+  http://caffe.berkeleyvision.org/gathered/examples/imagenet.html
 '''
 
 import gflags
@@ -49,9 +56,9 @@ def create_lmdbs():
       if 'TOOLS=build/tools' in lines[i]:
         lines[i] = '\n'
       if 'TRAIN_DATA_ROOT=/path/to/imagenet/train/' in lines[i]:
-        lines[i] = 'TRAIN_DATA_ROOT=' + join(WNID_DIR, 'images/train') + '\n'
+        lines[i] = 'TRAIN_DATA_ROOT=' + join(WNID_DIR, 'images/train/') + '\n'
       if 'VAL_DATA_ROOT=/path/to/imagenet/val/' in lines[i]:
-        lines[i] = 'VAL_DATA_ROOT=' + join(WNID_DIR, 'images/test') + '\n'
+        lines[i] = 'VAL_DATA_ROOT=' + join(WNID_DIR, 'images/test/') + '\n'
       if SHOULD_RESIZE_IMAGES and 'RESIZE=false' in lines[i]:
         lines[i] = 'RESIZE=true\n'
       if 'GLOG_logtostderr=1 $TOOLS/convert_imageset' in lines[i]:
@@ -59,22 +66,26 @@ def create_lmdbs():
           lines[i] = 'GLOG_logtostderr=1 '
         else:
           lines[i] = 'GLOG_logtostderr=0 '
-        lines[i] += join(ROOT, 'caffe/build/tools/convert_imageset') + '\\\n'
+        lines[i] += join(ROOT, 'caffe/.build_release/tools/convert_imageset.bin') + '\\\n'
       if '$DATA/val.txt \\' in lines[i]:
         lines[i] = '    $DATA/test.txt \\\n'
       if '$EXAMPLE/ilsvrc12_val_lmdb' in lines[i]:
         lines[i] = '    $EXAMPLE/ilsvrc12_test_lmdb\n'
-  with open(join(WNID_DIR, 'aux/create_imagenet.sh'), 'w') as f:
+  create_imagenet_filename = join(WNID_DIR, 'aux/create_imagenet.sh')
+  with open(create_imagenet_filename, 'w') as f:
     f.writelines(lines)
+  system('chmod 777 ' + create_imagenet_filename)
+  system(create_imagenet_filename)
 
 def compute_image_mean():
   # compute_image_mean Usage:
   # compute_image_mean input_db output_file db_backend[leveldb or lmdb]
-  system('/Users/rose/home/video-object-detection/caffe/.build_release/tools/'
-         'compute_image_mean.bin '
-         join(WNID_DIR, 'ilsvrc12_train_lmdb '),
-         'image_mean.binaryproto '
+  cmd = ('/Users/rose/home/video-object-detection/caffe/.build_release/tools/'
+         'compute_image_mean.bin ' + join(WNID_DIR, 'ilsvrc12_train_lmdb ') + \
+         join(WNID_DIR, 'image_mean.binaryproto ') + \
          'lmdb')
+  print cmd
+  system(cmd)
 
 if __name__ == '__main__':
   set_gflags()

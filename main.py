@@ -89,5 +89,8 @@ def test_image_annotator():
     'zPN6ec7SevU_10000_n02965783',
     'n02965783')
 
+def test_detector_on_eggs():
+  where_is_noun_in_video(video_id, noun_id)
+
 if __name__ == '__main__':
   show_nouns_in_videos(1)
