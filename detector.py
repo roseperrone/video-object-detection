@@ -16,9 +16,8 @@ from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 ROOT = dirname(abspath(__file__))
 
 @timeit
-def detect(image_dir,
-      output_filename = '/tmp/detection_results.bin',
-      caffemodel='data/models/data/models/bvlc_reference_caffenet.caffemodel',
+def detect(image_dir, output_filename,
+      caffemodel='data/models/bvlc_reference_caffenet.caffemodel',
       deploy_prototxt='data/models/bvlc_reference_caffenet/deploy.prototxt'):
   '''
   On mac 10.9 running MATLAB R2013a, to make the selective_search work
@@ -33,7 +32,6 @@ def detect(image_dir,
   (see http://stackoverflow.com/questions/22367516/mex-compile-error-unknown-type-name-char16-t)
   '''
   image_filenames_txt = '/tmp/image_filenames.txt'
-  output_filename = '/tmp/detection_results.bin'
   with open(image_filenames_txt, 'w') as f:
     # the first frame is usually blank, or a title screen
     image_filenames = ordered_listdir(
@@ -52,4 +50,5 @@ def detect(image_dir,
     cmd += ' > /dev/null'
   print cmd
   system(cmd)
+  print output_filename
   return output_filename
