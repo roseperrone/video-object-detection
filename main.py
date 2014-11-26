@@ -17,7 +17,7 @@ from video_fetcher import video_url, fetch_video
 from image_utils import get_prepared_images
 from classifier import classify
 from detector import detect
-from image_annotator import draw_detector_results
+from image_annotator import draw_detection_results
 from image_utils import show_image
 
 from config import TOP_PERCENTAGE
@@ -36,11 +36,12 @@ def where_is_noun_in_video(video_id, wnid):
   video_filename = fetch_video(url)
   image_dir = get_prepared_images(url, 10000, video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
-  #predictions_filename = detect(image_dir,
-  #  join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
-  #  join(wnid_dir, 'aux/deploy.prototxt'))
-  predictions_filename = '/tmp/detection_results.bin'
-  draw_detector_results(predictions_filename,
+  detections_filename = detect(image_dir, '/tmp/bvlc_detection_results.bin')
+
+    #join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
+    #join(wnid_dir, 'aux/deploy.prototxt'))
+  # detections_filename = '/tmp/detection_results.bin'
+  draw_detection_results(detections_filename,
     join(ROOT, 'data/imagenet', wnid, 'annotated', basename(image_dir)))
 
 def show_nouns_in_videos(num_videos_per_noun):

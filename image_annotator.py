@@ -5,21 +5,22 @@ from PIL import Image
 import numpy as np
 import cv2
 
-from imagenet import top_boxed_scores, get_description
+from imagenet import (top_boxed_scores, get_description,
+                      get_boxes)
 from image_utils import convert_bgr_to_rgb
 from performance import timeit
 from config import TOP_PERCENTAGE
 
 
 @timeit
-def draw_detector_results(detector_output_filename, target_dir):
-  print detector_output_filename
+def draw_detection_results(detection_output_filename, target_dir):
+  print detection_output_filename
   print target_dir
 
   # boxed_scores =  # _find_boxes_containing_noun(wnid,
-  boxed_scores = top_boxed_scores(detector_output_filename, 100)
+  boxes = get_boxes(detection_output_filename)
   import pdb; pdb.set_trace()
-  draw_boxes(boxed_scores, target_dir)
+  draw_boxes(boxes, target_dir)
 
 def _find_boxes_containing_noun(wnid, labelled_boxes):
   found = defaultdict(list)

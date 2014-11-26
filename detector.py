@@ -17,6 +17,7 @@ ROOT = dirname(abspath(__file__))
 
 @timeit
 def detect(image_dir,
+      output_filename = '/tmp/detection_results.bin',
       caffemodel='data/models/data/models/bvlc_reference_caffenet.caffemodel',
       deploy_prototxt='data/models/bvlc_reference_caffenet/deploy.prototxt'):
   '''

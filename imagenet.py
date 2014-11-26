@@ -10,6 +10,31 @@ from os.path import join
 from collections import defaultdict
 
 
+def get_boxes(detection_output_file):
+  '''
+  Returns all boxes that have the score for label "1" higher than the
+  score for label "0". Label "1" is the positive category.
+
+  The data frame has these fields:
+    index (which is the image filename)
+    prediction (a matrix of one score per class. Here we have two classes)
+    xmin
+    xmax
+    ymin
+    ymax
+  '''
+  df = pd.read_pickle(detection_output_file)
+  boxes = defaultdict(list)
+  import pdb; pdb.set_trace()
+  for i in range(df.index.shape[0]):
+    # do something with...
+    pred = df.prediction[i].as_matrix()
+    if pred[1] > pred[0]:
+      boxes[df.index[i]].append(
+        (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i]))
+  import pdb; pdb.set_trace()
+
+
 def _top_scores(predictions, n_top_scores=100):
   '''
   Arguments:
@@ -39,7 +64,7 @@ def top_boxed_scores(detection_output_file, n_top_scores=100):
       `scores` is an ordered list of `n_top_scores`. `noun_ids`
       is a list of ImageNet noun ids that correspond to the scores.
   '''
-  df = pd.read_pickle('/tmp/detection_results.bin')
+  df = pd.read_pickle(detection_output_file)
   boxed_scores = defaultdict(list)
   for i in range(df.index.shape[0]):
     noun_ids, scores = _top_scores(df.prediction[i].as_matrix(),
