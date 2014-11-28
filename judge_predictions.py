@@ -14,8 +14,8 @@ Usage:
   covers one of the nouns, and one box covers no nouns, you should type
   "cnnp" and then hit enter.
   If there are no nouns and no bounding boxes, you should just hit enter.
-      c (correct) - A noun is "correctly" in the box. A correct bounding
-                    box means that the
+      c (correct) - True positive. A noun is "correctly" in the box.
+                    A correct bounding box means that the
                     intersection of the bounding box with what you think
                     should be the actual bounding box is 50% of the union
                     of these two boxes.
