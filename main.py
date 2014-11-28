@@ -36,7 +36,8 @@ def where_is_noun_in_video(video_id, wnid):
   video_filename = fetch_video(url)
   image_dir = get_prepared_images(url, 10000, video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
-  detections_filename = detect(image_dir, '/tmp/bvlc_detection_results.bin')
+  detections_filename = '/tmp/bvlc_detection_results.bin'
+  #detections_filename = detect(image_dir, '/tmp/bvlc_detection_results.bin')
 
     #join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
     #join(wnid_dir, 'aux/deploy.prototxt'))

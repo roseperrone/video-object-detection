@@ -19,7 +19,6 @@ def draw_detection_results(detection_output_filename, target_dir):
 
   # boxed_scores =  # _find_boxes_containing_noun(wnid,
   boxes = get_boxes(detection_output_filename)
-  import pdb; pdb.set_trace()
   draw_boxes(boxes, target_dir)
 
 def _find_boxes_containing_noun(wnid, labelled_boxes):
@@ -35,51 +34,25 @@ def _find_boxes_containing_noun(wnid, labelled_boxes):
       found[image_filename].append(None)
   return found
 
-def draw_boxes(labelled_boxes, target_dir):
+def draw_boxes(boxes, target_dir):
   system('rm -rf ' + target_dir)
   system('mkdir -p ' + target_dir)
 
-  means = _mean_scores(labelled_boxes)
+  for image_filename, bs in boxes.iteritems():
+    for i, coordinates in enumerate(bs):
+      _draw_box(image_filename, i, coordinates, target_dir)
 
-  for image_filename, boxes in labelled_boxes.iteritems():
-    for i, tup in enumerate(boxes):
-      if tup is None:
-        _draw_not_found(image_filename, target_dir, wnid)
-      else:
-        _draw_box(image_filename, i, tup, means[image_filename], target_dir)
-
-def _draw_not_found(image_filename, target_dir, wnid):
-  cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
-  cmd += ' -pointsize 14 -fill chartreuse'
-  text = get_description(wnid) + '\n'
-  text += 'Not found in the top ' + str(int(1000*TOP_PERCENTAGE)) + \
-    '\nclasses out of 1000'
-  cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
-  target = join(target_dir,
-                '_'.join([splitext(basename(image_filename))[0],
-                          '0', '0', '0.jpg']))
-  cmd += ' ' + target
-  system(cmd)
-
-def _draw_box(image_filename, window_id, tup, score_mean, target_dir):
-  xmin, xmax, ymin, ymax, wnid, score = tup
+def _draw_box(image_filename, window_id, coordinates, target_dir):
+  xmin, xmax, ymin, ymax = coordinates
   cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
   cmd += ' -fill none -stroke chartreuse -strokewidth 2'
   cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
             (int(xmin), int(ymin), int(xmax), int(ymax)))
-  cmd += ' -pointsize 14 -fill chartreuse'
-  text = '{0:.4f}'.format(score) + ' ' + get_description(wnid) + '\n'
-  text += 'Found in the top ' + str(int(1000*TOP_PERCENTAGE))
-  text += ' of 1000 classes\n'
-  text += 'The mean score in the\ntop ' + str(int(1000*TOP_PERCENTAGE))
-  text += ' classes is ' + '{0:.4f}'.format(score_mean)
-  cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
   target = join(target_dir,
                 '_'.join([splitext(basename(image_filename))[0],
-                          str(window_id),
-                          str(int(1000 * score)),
-                          str(int(1000 *score_mean)) + '.jpg']))
+                          str(window_id) + '.jpg']))
   cmd += ' ' + target
+  print 'TARGET:', target
   system(cmd)
 
 def _mean_scores(labelled_boxes):
