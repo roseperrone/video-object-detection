@@ -23,10 +23,10 @@ ROOT = dirname(abspath(__file__))
 # This default wnid is for eggs
 gflags.DEFINE_string('wnid', 'n07840804',
  'The wordnet id of the noun in the positive images')
-
-# Whether caffe should resize images to 256x256. Should be True when
-# the images are net that size already
-SHOULD_RESIZE_IMAGES = True
+gflags.DEFINE_string('dataset', None, 'The name of the directory that contains '
+                     'the test and train image directories, as well as the '
+                     'train.txt and test.txt files')
+gflags.MarkFlagAsRequired('dataset')
 
 # Whether caffe should resize images to 256x256. Should be True when
 # the images are net that size already
@@ -52,13 +52,15 @@ def create_lmdbs():
         lines[i] = 'EXAMPLE=' + WNID_DIR + '\n'
       if 'DATA=data/ilsvrc12' in lines[i]:
         # the location of the category files
-        lines[i] = 'DATA=' + WNID_DIR + '\n'
+        lines[i] = 'DATA=' + join(WNID_DIR, 'images', FLAGS.dataset) + '\n'
       if 'TOOLS=build/tools' in lines[i]:
         lines[i] = '\n'
       if 'TRAIN_DATA_ROOT=/path/to/imagenet/train/' in lines[i]:
-        lines[i] = 'TRAIN_DATA_ROOT=' + join(WNID_DIR, 'images/train/') + '\n'
+        lines[i] = 'TRAIN_DATA_ROOT=' + join(
+          WNID_DIR, 'images', FLAGS.dataset, 'train/') + '\n'
       if 'VAL_DATA_ROOT=/path/to/imagenet/val/' in lines[i]:
-        lines[i] = 'VAL_DATA_ROOT=' + join(WNID_DIR, 'images/test/') + '\n'
+        lines[i] = 'VAL_DATA_ROOT=' + join(WNID_DIR, 'images',
+          FLAGS.dataset, 'test/') + '\n'
       if SHOULD_RESIZE_IMAGES and 'RESIZE=false' in lines[i]:
         lines[i] = 'RESIZE=true\n'
       if 'GLOG_logtostderr=1 $TOOLS/convert_imageset' in lines[i]:
@@ -66,7 +68,8 @@ def create_lmdbs():
           lines[i] = 'GLOG_logtostderr=1 '
         else:
           lines[i] = 'GLOG_logtostderr=0 '
-        lines[i] += join(ROOT, 'caffe/.build_release/tools/convert_imageset.bin') + '\\\n'
+        lines[i] += join(ROOT,
+          'caffe/.build_release/tools/convert_imageset.bin') + '\\\n'
       if '$DATA/val.txt \\' in lines[i]:
         lines[i] = '    $DATA/test.txt \\\n'
       if '$EXAMPLE/ilsvrc12_val_lmdb' in lines[i]:

@@ -29,7 +29,7 @@ images.
 Copy this to a new file called deploy.prototxt:
 
 ```
-name: "<the name from train_val.prototxt>"
+name: "<the name in the train_val.prototxt>"
 input: "data"
 input_dim: 10
 input_dim: 3
