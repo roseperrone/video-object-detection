@@ -39,8 +39,8 @@ def create_lmdbs():
   for documentation
 
   These files should not exist prior to running this function:
-    WNID_DIR/ilsvrc12_train_lmbd
-    WNID_DIR/ilsvrc12_test_lmbd
+    DATASET_DIR/ilsvrc12_train_lmbd
+    DATASET_DIR/ilsvrc12_test_lmbd
   '''
   DEBUG_LOG = True # Set this to true to make `create_imagenet.sh`
                    # generate more information to inspect
@@ -49,7 +49,7 @@ def create_lmdbs():
     for i in range(len(lines)):
       if 'EXAMPLE=examples/imagenet' in lines[i]:
         # the destination dir of the train and test lmdb databases
-        lines[i] = 'EXAMPLE=' + WNID_DIR + '\n'
+        lines[i] = 'EXAMPLE=' + DATASET_DIR + '\n'
       if 'DATA=data/ilsvrc12' in lines[i]:
         # the location of the category files
         lines[i] = 'DATA=' + join(WNID_DIR, 'images', FLAGS.dataset) + '\n'
@@ -74,7 +74,7 @@ def create_lmdbs():
         lines[i] = '    $DATA/test.txt \\\n'
       if '$EXAMPLE/ilsvrc12_val_lmdb' in lines[i]:
         lines[i] = '    $EXAMPLE/ilsvrc12_test_lmdb\n'
-  create_imagenet_filename = join(WNID_DIR, 'aux/create_imagenet.sh')
+  create_imagenet_filename = join(DATASET_DIR, 'aux/create_imagenet.sh')
   with open(create_imagenet_filename, 'w') as f:
     f.writelines(lines)
   system('chmod 777 ' + create_imagenet_filename)
@@ -84,8 +84,8 @@ def compute_image_mean():
   # compute_image_mean Usage:
   # compute_image_mean input_db output_file db_backend[leveldb or lmdb]
   cmd = ('/Users/rose/home/video-object-detection/caffe/.build_release/tools/'
-         'compute_image_mean.bin ' + join(WNID_DIR, 'ilsvrc12_train_lmdb ') + \
-         join(WNID_DIR, 'image_mean.binaryproto ') + \
+         'compute_image_mean.bin ' + join(DATASET_DIR, 'ilsvrc12_train_lmdb ') + \
+         join(DATASET_DIR, 'image_mean.binaryproto ') + \
          'lmdb')
   print cmd
   system(cmd)
@@ -94,8 +94,10 @@ if __name__ == '__main__':
   set_gflags()
   global WNID_DIR
   WNID_DIR = join(ROOT, 'data/imagenet', FLAGS.wnid)
-  system('mkdir -p ' + join(WNID_DIR, 'aux'))
+  global DATASET_DIR
+  DATASET_DIR = join(WNID_DIR, 'images', FLAGS.dataset)
+  system('mkdir -p ' + join(DATASET_DIR, 'aux'))
   create_lmdbs()
   compute_image_mean()
-  system('mkdir -p ' + join(WNID_DIR, 'snapshots'))
+  system('mkdir -p ' + join(DATASET_DIR, 'snapshots'))
 

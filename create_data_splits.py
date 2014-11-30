@@ -160,16 +160,16 @@ def create_train_and_test_splits():
   download_negative_images(FLAGS.wnid, num_negative_images,
                            all_negative_images_dir)
 
-  #symlink(all_positive_images_dir,
-  #        positive_images_train_dir,
-  #        positive_images_test_dir,
-  #        num_positive_train_images,
-  #        num_positive_test_images)
-  #symlink(all_negative_images_dir,
-  #        negative_images_train_dir,
-  #        negative_images_test_dir,
-  #        num_negative_train_images,
-  #        num_negative_test_images)
+  symlink(all_positive_images_dir,
+          positive_images_train_dir,
+          positive_images_test_dir,
+          num_positive_train_images,
+          num_positive_test_images)
+  symlink(all_negative_images_dir,
+          negative_images_train_dir,
+          negative_images_test_dir,
+          num_negative_train_images,
+          num_negative_test_images)
 
   create_category_files('train')
   create_category_files('test')
@@ -201,12 +201,12 @@ def symlink(all_dir, train_dir, test_dir, train_count, test_count):
   num_linked = 0
   for name in listdir(all_dir):
     if num_linked < train_count:
-      system('ln -s ' + join(all_dir, name) + ' ' + train_dir)
-      system('ln -s ' + join(all_dir, name) + ' ' + \
+      system('ln -s "' + join(all_dir, name) + '" ' + train_dir)
+      system('ln -s "' + join(all_dir, name) + '" ' + \
         join(ROOT, 'data/imagenet', FLAGS.wnid, 'images', FLAGS.dataset, 'train'))
     elif num_linked < train_count + test_count:
-      system('ln -s ' + join(all_dir, name) + ' ' + test_dir)
-      system('ln -s ' + join(all_dir, name) + ' ' + \
+      system('ln -s "' + join(all_dir, name) + '" ' + test_dir)
+      system('ln -s "' + join(all_dir, name) + '" ' + \
         join(ROOT, 'data/imagenet', FLAGS.wnid, 'images', FLAGS.dataset, 'test'))
     else:
       return

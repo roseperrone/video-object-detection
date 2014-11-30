@@ -1,17 +1,22 @@
+After completeing these instructions, you will have made these 3 files:
+train_val.protxt, solver.protxt, and deploy.prototxt
 
 Use absolute paths for simplicity.
 
-First, copy the model's train_val.prototxt to data/imagenet/<wnid_dir>/aux
+First, copy the model's train_val.prototxt to
+data/imagenet/<wnid_dir>/images/<dataset>/aux
 Change the files for each "source:" and "mean_file:" line to the lmbd
 files and image mean created by prepare_data.py.
 Find the last layer that contains a "num_output" field and change that to
 the number of categories (in my case, two: one positive, one negative).
-Maybe also change the batch_size from 64 to 32, in case I run out of memory
+I also change the batch_size from 64 to 32, in case I run out of memory
 on my macbook.
 
-Copy the model's solver.prototxt to data/imagenet/<wnid_dir>/aux
+Copy the model's solver.prototxt to
+data/imagenet/<wnid_dir>/images/<dataset>/aux
 Change the "net:" path to the path to the train_val.prototxt you just created.
-Change the "snapshot_prefix:" to data/imagenet/<wnid_dir>/snapshots
+Change the "snapshot_prefix:" to
+data/imagenet/<wnid_dir>/snapshots/images/<dataset>/snapshots
 Change the "server_mode:" to CPU
 Change the "snapshot:" to 200. On my macbook, it takes 3 minutes per 20
 iterations, so this produces one snapshot per half hour. On a K40 machine
