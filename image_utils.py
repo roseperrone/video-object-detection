@@ -31,7 +31,7 @@ def get_prepared_images(url, ms_between_frames, video_filename, wnid=None):
     image_dir = join(ROOT, 'data/images',
                      video_id + '_' + str(ms_between_frames))
   else:
-    image_dir = join(ROOT, 'data/imagenet', wnid, 'prepared',
+    image_dir = join(ROOT, 'data/imagenet', wnid, 'prepared-video-frames',
                      video_id + '_' + str(ms_between_frames))
   if exists(image_dir):
     return image_dir

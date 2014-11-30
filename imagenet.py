@@ -26,11 +26,12 @@ def get_boxes(detection_output_file):
   df = pd.read_pickle(detection_output_file)
   boxes = defaultdict(list)
   for i in range(df.index.shape[0]):
-    # do something with...
     pred = df.prediction[i].as_matrix()
     if pred[1] > pred[0]:
       boxes[df.index[i]].append(
         (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i]))
+  print len(boxes)
+  import pdb; pdb.set_trace()
   return boxes
 
 

@@ -6,7 +6,8 @@
   You can find information about this neural net here:
     https://gist.github.com/ksimonyan/3785162f95cd2d5fee77#file-readme-md
 '''
-from os.path import dirname, abspath, basename, join
+from os.path import dirname, abspath, basename, join, exists
+import sys
 from PIL import Image
 import numpy as np
 from datetime import datetime
@@ -36,12 +37,19 @@ def where_is_noun_in_video(video_id, wnid):
   video_filename = fetch_video(url)
   image_dir = get_prepared_images(url, 10000, video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
-  detections_filename = '/tmp/bvlc_detection_results.bin'
+  detections_filename = detect(image_dir,
+    '/tmp/equal_neg_pos_detection_results.bin',
+    caffemodel='data/imagenet/n07840804/images/equal-neg-pos/snapshots_iter_1000.caffemodel',
+    deploy_prototxt='data/imagenet/n07840804/images/equal-neg-pos/aux/deploy.prototxt')
+  #detections_filename = '/tmp/bvlc_detection_results.bin'
   #detections_filename = detect(image_dir, '/tmp/bvlc_detection_results.bin')
 
     #join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
     #join(wnid_dir, 'aux/deploy.prototxt'))
   # detections_filename = '/tmp/detection_results.bin'
+  if not exists(detections_filename):
+    print 'Something went wrong during detection'
+    sys.exit(1)
   draw_detection_results(detections_filename,
     join(ROOT, 'data/imagenet', wnid, 'annotated', basename(image_dir)))
 

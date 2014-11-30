@@ -38,8 +38,8 @@ name: "<the name in the train_val.prototxt>"
 input: "data"
 input_dim: 10
 input_dim: 3
-input_dim: 227
-input_dim: 227
+input_dim: 224
+input_dim: 224
 ```
 
 Append to that all layers in train_val.prototxt.
