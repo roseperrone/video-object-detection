@@ -37,11 +37,16 @@ def where_is_noun_in_video(video_id, wnid):
   video_filename = fetch_video(url)
   image_dir = get_prepared_images(url, 10000, video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
+  detections_filename = '/tmp/finetuned_bvlc_detection_results.bin'
+  #detections_filename = detect(image_dir, '/tmp/finetuned_bvlc_detection_results.bin',
+  #  caffemodel='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/finetuned-bvlc/snapshots/_iter_1000.caffemodel',
+  #  deploy_prototxt='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/finetuned-bvlc/aux/deploy.prototxt')
   #detections_filename = detect(image_dir,
   #  '/tmp/my_bvlc_detection_results.bin',
   #  caffemodel='data/imagenet/n07840804/images/bvlc/snapshots_iter_1600.caffemodel',
   #  deploy_prototxt='data/imagenet/n07840804/images/bvlc/aux/deploy.prototxt')
-  detections_filename = '/tmp/my_bvlc_detection_results.bin'
+
+  #detections_filename = '/tmp/my_bvlc_detection_results.bin'
 
   #detections_filename = detect(image_dir,
   #  '/tmp/equal_neg_pos_detection_results.bin',

@@ -224,15 +224,22 @@ def create_category_files(stage):
   Therefore I use train and test as the filenames in the category files, but
   I use the [train, test]-[positive-negative] directories to determine whether
   the filename should be followed with a 0 or 1.
+
+  I also create image-data-train.txt and image-data-test.txt, because
+  the IMAGE_DATA layer requires full pathnames rather than just basenames,
+  which LMDB requires (for a DATA layer in the net).
   '''
   wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
   positive_dir = join(wnid_dir, 'images', FLAGS.dataset, stage + '-positive')
   negative_dir = join(wnid_dir, 'images', FLAGS.dataset, stage + '-negative')
-  with open(join(wnid_dir,'images', FLAGS.dataset, stage + '.txt'), 'w') as f:
-    for name in listdir(positive_dir):
-      f.write(name + ' 1\n')
-    for name in listdir(negative_dir):
-      f.write(name + ' 0\n')
+  with open(join(wnid_dir,'images', FLAGS.dataset, 'image-data-' + stage + '.txt'), 'w') as fi:
+    with open(join(wnid_dir,'images', FLAGS.dataset, stage + '.txt'), 'w') as f:
+      for name in listdir(positive_dir):
+        f.write(name + ' 1\n')
+        fi.write(join(positive_dir, name) + ' 1\n')
+      for name in listdir(negative_dir):
+        f.write(name + ' 0\n')
+        fi.write(join(negative_dir, name) + ' 0\n')
 
 if __name__ == '__main__':
   set_gflags()
