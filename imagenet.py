@@ -2,6 +2,9 @@
 This file contains utility methods for mapping prediction scores
 to class labels, and in the case of the detector, also detected
 bounding boxes.
+
+Note that I no longer use a lot of these utility methods. I'll delete them
+later.
 '''
 
 import heapq
@@ -27,6 +30,7 @@ def get_boxes(detection_output_file):
   boxes = defaultdict(list)
   for i in range(df.index.shape[0]):
     pred = df.prediction[i].as_matrix()
+    print pred[0], pred[1]
     if pred[1] > pred[0]:
       boxes[df.index[i]].append(
         (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i]))

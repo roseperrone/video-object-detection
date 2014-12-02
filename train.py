@@ -19,6 +19,8 @@ gflags.DEFINE_boolean('time', False, 'Set to true if you are interested in '
   'dissecting the runtime')
 gflags.DEFINE_string('snapshot', None, 'If training got interrupted, '
   'resume from this snapshot')
+gflags.DEFINE_string('pretrained_caffemodel', None, 'The path to a .caffemodel '
+  'you want to finetune')
 
 ROOT = dirname(abspath(__file__))
 
@@ -32,5 +34,7 @@ if __name__ == '__main__':
     cmd += ' train --solver=' + join(aux_dir, 'solver.prototxt')
     if FLAGS.snapshot is not None:
       cmd += ' --snapshot=' + FLAGS.snapshot
+    if FLAGS.pretrained_caffemodel is not None:
+      cmd += ' --weights=' + FLAGS.pretrained_caffemodel
   print cmd
   system(cmd)
