@@ -1,6 +1,8 @@
 If you want to pretrain a model on an existing model, follow the 
 instructions on the flickr-style finetuning example:
 https://github.com/BVLC/caffe/tree/master/examples/finetune_flickr_style
+To avoid a loss of nan, change the weight_filler types from gaussian to xavier,
+and make sure the base learning rate is 0.001 or lower.
 
 If you want to train a model from scratch, follow these instructions:
 After completeing these instructions, you will have made these 3 files:

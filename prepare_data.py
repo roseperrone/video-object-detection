@@ -50,30 +50,32 @@ def create_lmdbs():
       if 'EXAMPLE=examples/imagenet' in lines[i]:
         # the destination dir of the train and test lmdb databases
         lines[i] = 'EXAMPLE=' + DATASET_DIR + '\n'
-      if 'DATA=data/ilsvrc12' in lines[i]:
+      elif 'DATA=data/ilsvrc12' in lines[i]:
         # the location of the category files
         lines[i] = 'DATA=' + join(WNID_DIR, 'images', FLAGS.dataset) + '\n'
-      if 'TOOLS=build/tools' in lines[i]:
+      elif 'TOOLS=build/tools' in lines[i]:
         lines[i] = '\n'
-      if 'TRAIN_DATA_ROOT=/path/to/imagenet/train/' in lines[i]:
+      elif 'TRAIN_DATA_ROOT=/path/to/imagenet/train/' in lines[i]:
         lines[i] = 'TRAIN_DATA_ROOT=' + join(
           WNID_DIR, 'images', FLAGS.dataset, 'train/') + '\n'
-      if 'VAL_DATA_ROOT=/path/to/imagenet/val/' in lines[i]:
+      elif 'VAL_DATA_ROOT=/path/to/imagenet/val/' in lines[i]:
         lines[i] = 'VAL_DATA_ROOT=' + join(WNID_DIR, 'images',
           FLAGS.dataset, 'test/') + '\n'
-      if SHOULD_RESIZE_IMAGES and 'RESIZE=false' in lines[i]:
+      elif SHOULD_RESIZE_IMAGES and 'RESIZE=false' in lines[i]:
         lines[i] = 'RESIZE=true\n'
-      if 'GLOG_logtostderr=1 $TOOLS/convert_imageset' in lines[i]:
+      elif 'GLOG_logtostderr=1 $TOOLS/convert_imageset' in lines[i]:
         if DEBUG_LOG:
           lines[i] = 'GLOG_logtostderr=1 '
         else:
           lines[i] = 'GLOG_logtostderr=0 '
         lines[i] += join(ROOT,
           'caffe/.build_release/tools/convert_imageset.bin') + '\\\n'
-      if '$DATA/val.txt \\' in lines[i]:
+      elif '$DATA/val.txt \\' in lines[i]:
         lines[i] = '    $DATA/test.txt \\\n'
-      if '$EXAMPLE/ilsvrc12_val_lmdb' in lines[i]:
+      elif '$EXAMPLE/ilsvrc12_val_lmdb' in lines[i]:
         lines[i] = '    $EXAMPLE/ilsvrc12_test_lmdb\n'
+      elif '--shuffle' in lines[i]:
+        lines[i] = '    --shuffle=True \\\n'
   create_imagenet_filename = join(DATASET_DIR, 'aux/create_imagenet.sh')
   with open(create_imagenet_filename, 'w') as f:
     f.writelines(lines)
