@@ -8,5 +8,5 @@ def set_gflags():
     # e.g. hey.py --what=2 777
     # now argv is [777], I bet
   except gflags.FlagsError, e:
-    print '%s\\nUsage: %s ARGS\\n%s' % (e, sys.argv[0], FLAGS)
+    print '%s\\nUsage: %s ARGS\\n%s' % (e, sys.argv[0], gflags.FLAGS)
     sys.exit(1)

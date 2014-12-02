@@ -34,7 +34,6 @@ def get_boxes(detection_output_file):
     if pred[1] > pred[0]:
       boxes[df.index[i]].append(
         (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i]))
-  print len(boxes)
   import pdb; pdb.set_trace()
   return boxes
 

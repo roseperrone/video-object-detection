@@ -23,7 +23,9 @@ Copy the model's solver.prototxt to
 data/imagenet/<wnid_dir>/images/<dataset>/aux
 Change the "net:" path to the path to the train_val.prototxt you just created.
 Change the "snapshot_prefix:" to
-data/imagenet/<wnid_dir>/snapshots/images/<dataset>/snapshots
+data/imagenet/<wnid_dir>/snapshots/images/<dataset>/snapshots/snapshot
+The snapshots directory must exist, and the "snapshot" will be the prefix of
+"_iter_100..."
 Change the "server_mode:" to CPU
 Change the "snapshot:" to 1000. On my macbook, it takes 3 minutes per 20
 iterations, so this produces one snapshot per half hour. On a K40 machine
@@ -32,11 +34,7 @@ bvlc_refference_caffenet on 1000 ImageNet categories takes 26 seconds per
 20 iterations, which is ~5.2 ms per image, so I think they're training on about
 5100 images. I'm training on 19500 images (there are 7 times as many
 negative images as positive images)
-Change the "max_iter" to 3000. (this is 45000 for NIN, but that would take
-me 112 hours, which is 4.7 days). This is the same as test_iter. It's
-annoying that the test is also performed on an untrained network, because
-that takes 70 minutes, and just tells us the ratio of our positive to negative
-images.
+Don't bother reducing max_iter, because you can interrupt training at any time.
 
 Copy this to a new file called deploy.prototxt:
 
@@ -45,7 +43,7 @@ name: "<the name in the train_val.prototxt>"
 input: "data"
 input_dim: 10
 input_dim: 3
-input_dim: 224
+input_dim: 224 # or whatever the crop_size is in train_val.prototxt
 input_dim: 224
 ```
 
