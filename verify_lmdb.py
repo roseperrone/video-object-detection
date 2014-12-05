@@ -20,7 +20,6 @@ gflags.MarkFlagAsRequired('db_path')
 def main():
   if not os.path.exists(FLAGS.db_path):
       raise Exception('db not found')
-
   lmdb_env = lmdb.open(FLAGS.db_path)  # equivalent to mdb_env_open()
   lmdb_txn = lmdb_env.begin()  # equivalent to mdb_txn_begin()
   lmdb_cursor = lmdb_txn.cursor()  # equivalent to mdb_cursor_open()

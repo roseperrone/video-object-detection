@@ -43,8 +43,11 @@ def draw_boxes(boxes, target_dir):
       _draw_box(image_filename, i, coordinates, target_dir)
 
 def _draw_box(image_filename, window_id, coordinates, target_dir):
-  xmin, xmax, ymin, ymax = coordinates
+  xmin, xmax, ymin, ymax, score = coordinates
   cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
+  cmd += ' -pointsize 17 -fill chartreuse'
+  text = "{:.2f}".format(score) + '\n'
+  cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
   cmd += ' -fill none -stroke chartreuse -strokewidth 2'
   cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
             (int(xmin), int(ymin), int(xmax), int(ymax)))

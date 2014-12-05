@@ -1,4 +1,4 @@
-# Simple object detection in YouTube videos.
+# Simple object detection in YouTube videos, using Caffe
 
 ## To train a net on a single noun, run these scripts
 
