@@ -200,13 +200,15 @@ def symlink(all_dir, train_dir, test_dir, train_count, test_count):
   '''
   num_linked = 0
   for name in listdir(all_dir):
+    assert ' ' not in name # The LMDB creation script silently fails on
+                           # spaces in filenames
     if num_linked < train_count:
-      system('ln -s "' + join(all_dir, name) + '" ' + train_dir)
-      system('ln -s "' + join(all_dir, name) + '" ' + \
+      system('ln -s ' + join(all_dir, name) + ' ' + train_dir)
+      system('ln -s ' + join(all_dir, name) + ' ' + \
         join(ROOT, 'data/imagenet', FLAGS.wnid, 'images', FLAGS.dataset, 'train'))
     elif num_linked < train_count + test_count:
-      system('ln -s "' + join(all_dir, name) + '" ' + test_dir)
-      system('ln -s "' + join(all_dir, name) + '" ' + \
+      system('ln -s ' + join(all_dir, name) + ' ' + test_dir)
+      system('ln -s ' + join(all_dir, name) + ' ' + \
         join(ROOT, 'data/imagenet', FLAGS.wnid, 'images', FLAGS.dataset, 'test'))
     else:
       return

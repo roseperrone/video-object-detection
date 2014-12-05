@@ -69,7 +69,9 @@ def download_negative_images(wnid, count, target_dir):
       one_or_zero_filenames = glob(join(tmp, '*.[Jj][Pp][Gg]'))
       if len(one_or_zero_filenames) == 0:
         continue
-      name = basename(one_or_zero_filenames[0])
+      # There cannot be spaces in the filename. If there are spaces,
+      # silent problems appear during training.
+      name = basename(one_or_zero_filenames[0]).replace(' ', '_')
       if crop_image_randomly(wnid, join(tmp, name),
                             join(target_dir, id + '_' + name)):
         count += 1
