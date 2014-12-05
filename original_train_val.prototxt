@@ -5,14 +5,14 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/ilsvrc12_train_lmdb"
+    source: "/home/linmin/IMAGENET-LMDB/imagenet-train-lmdb"
     backend: LMDB
     batch_size: 64
   }
   transform_param {
     crop_size: 224
     mirror: true
-    mean_file: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/image_mean.binaryproto"
+    mean_file: "/home/linmin/IMAGENET-LMDB/imagenet-train-mean"
   }
   include: { phase: TRAIN }
 }
@@ -22,14 +22,14 @@ layers {
   name: "data"
   type: DATA
   data_param {
-    source: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/ilsvrc12_test_lmdb"
+    source: "/home/linmin/IMAGENET-LMDB/imagenet-val-lmdb"
     backend: LMDB
     batch_size: 89
   }
   transform_param {
     crop_size: 224
     mirror: false
-    mean_file: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/image_mean.binaryproto"
+    mean_file: "/home/linmin/IMAGENET-LMDB/imagenet-train-mean"
   }
   include: { phase: TEST }
 }
@@ -418,7 +418,7 @@ layers {
   weight_decay: 1
   weight_decay: 0
   convolution_param {
-    num_output: 2
+    num_output: 1000
     kernel_size: 1
     stride: 1
     weight_filler {
