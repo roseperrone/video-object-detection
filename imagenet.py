@@ -13,37 +13,6 @@ from os.path import join
 from collections import defaultdict
 
 
-def get_boxes(detection_output_file):
-  '''
-  Returns all boxes that have the score for label "1" higher than the
-  score for label "0". Label "1" is the positive category.
-
-  The data frame has these fields:
-    index (which is the image filename)
-    prediction (a matrix of one score per class. Here we have two classes)
-    xmin
-    xmax
-    ymin
-    ymax
-  '''
-  df = pd.read_pickle(detection_output_file)
-  boxes = defaultdict(list)
-  neg = 0
-  pos = 0
-  for i in range(df.index.shape[0]):
-    pred = df.prediction[i].as_matrix()
-    print pred[0], pred[1]
-    if pred[1] > pred[0]:
-      pos += 1
-      boxes[df.index[i]].append(
-        (df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i], pred[1]))
-    else:
-      neg += 1
-  print pos, 'positive results and', neg, 'negative results'
-  import pdb; pdb.set_trace()
-  return boxes
-
-
 def _top_scores(predictions, n_top_scores=100):
   '''
   Arguments:

@@ -5,8 +5,8 @@ from PIL import Image
 import numpy as np
 import cv2
 
-from imagenet import (top_boxed_scores, get_description,
-                      get_boxes)
+from imagenet import top_boxed_scores, get_description
+from nms import get_boxes
 from image_utils import convert_bgr_to_rgb
 from performance import timeit
 from config import TOP_PERCENTAGE
@@ -39,23 +39,30 @@ def draw_boxes(boxes, target_dir):
   system('mkdir -p ' + target_dir)
 
   for image_filename, bs in boxes.iteritems():
-    for i, coordinates in enumerate(bs):
-      _draw_box(image_filename, i, coordinates, target_dir)
+    cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
+    cmd += ' -fill none -stroke chartreuse -strokewidth 2'
+    for xmin, ymin, xmax, ymax, score in bs:
+      cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
+                (int(xmin), int(ymin), int(xmax), int(ymax)))
+    target = join(target_dir, splitext(basename(image_filename))[0] + '.jpg')
+    cmd += ' ' + target
+    print cmd
+    system(cmd)
 
 def _draw_box(image_filename, window_id, coordinates, target_dir):
   xmin, xmax, ymin, ymax, score = coordinates
   cmd = 'convert ' + convert_bgr_to_rgb(image_filename)
-  cmd += ' -pointsize 17 -fill chartreuse'
-  text = "{:.2f}".format(score) + '\n'
-  cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
   cmd += ' -fill none -stroke chartreuse -strokewidth 2'
   cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
             (int(xmin), int(ymin), int(xmax), int(ymax)))
+  #cmd += ' -pointsize 17 -fill chartreuse'
+  #text = 'Score:' + "{:.2f}".format(score)
+  #cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
   target = join(target_dir,
                 '_'.join([splitext(basename(image_filename))[0],
                           str(window_id) + '.jpg']))
   cmd += ' ' + target
-  print 'TARGET:', target
+  print cmd
   system(cmd)
 
 def _mean_scores(labelled_boxes):

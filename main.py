@@ -25,52 +25,55 @@ from config import TOP_PERCENTAGE
 
 ROOT = dirname(abspath(__file__))
 
+# The key is the trained model name, and the value is a tuple containing
+# a path to the caffemodel and the deploy.prototxt of the trained model
+MODELS = {
+  'alexnet': (
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot_iter_6000.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/deploy.prototxt'
+  ),
+  'nin-equal': (
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_500.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
+  ),
+}
 
-def where_is_noun_in_video(video_id, wnid):
+def draw_noun_detections_on_video_frames(video_id, wnid):
   '''
-  Returns:
-    a list of tuples of video segments in which that noun appears,
-    in seconds. e.g. [(14.4, 20.2), (34.2, 89.2)]
+  Draws boxes of detections of <wnid> on the frames of the video.
+  The boxes have been non-maximally suppressed.
+
+  Because selective search provides about 2000 boxes per frame, and the noun
+  usually isn't even present, I don't consider a detection positive if the score
+  for the positive class is higher than the negative class. Instead, I
+  consider a detection positive if the positive score is > 0.99 (out of 1.00)
+
+  If you want to change the drawing code, but not have to rerun the detection,
+  simply delete the directory of annotated images you want to redraw (found in
+  the data/imagenet/<wnid>/annotated directory)
+
+  The names of the annotated directories take this form:
+    <model>_<video_id>_<ms_betwen_frames>
   '''
-  # TODO change 10,000 to 1,000 after the full pipeline works
+  model = 'alexnet'
+  ms_between_frames = 10000
+
   url = video_url(video_id)
   video_filename = fetch_video(url)
-  image_dir = get_prepared_images(url, 10000, video_filename, wnid)
+  image_dir = get_prepared_images(url, ms_between_frames, video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
+  annotated_dir = join(wnid_dir, 'annotated', basename(image_dir))
+  if exists(annotated_dir):
+    return
 
-  # finally training after the data bug
-  detections_filename = detect(image_dir,
-    '/tmp/alexnet_detection_results.bin',
-    caffemodel='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot_iter_3000.caffemodel',
-    deploy_prototxt='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/deploy.prototxt')
-
-
-  #detections_filename = '/tmp/finetuned_bvlc_detection_results.bin'
-  #detections_filename = detect(image_dir, '/tmp/finetuned_bvlc_detection_results.bin',
-    #caffemodel='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/finetuned-bvlc/snapshots/_iter_1000.caffemodel',
-    #deploy_prototxt='/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/finetuned-bvlc/aux/deploy.prototxt')
-  #detections_filename = detect(image_dir,
-  #  '/tmp/my_bvlc_detection_results.bin',
-  #  caffemodel='data/imagenet/n07840804/images/bvlc/snapshots_iter_1600.caffemodel',
-  #  deploy_prototxt='data/imagenet/n07840804/images/bvlc/aux/deploy.prototxt')
-
-  #detections_filename = '/tmp/my_bvlc_detection_results.bin'
-
-  #detections_filename = detect(image_dir,
-  #  '/tmp/equal_neg_pos_detection_results.bin',
-  #  caffemodel='data/imagenet/n07840804/images/equal-neg-pos/snapshots_iter_1000.caffemodel',
-  #  deploy_prototxt='data/imagenet/n07840804/images/equal-neg-pos/aux/deploy.prototxt')
-  #detections_filename = '/tmp/bvlc_detection_results.bin'
-  #detections_filename = detect(image_dir, '/tmp/bvlc_detection_results.bin')
-
-    #join(wnid_dir, 'aux/snapshots/snapshots_iter_1000.caffemodel'),
-    #join(wnid_dir, 'aux/deploy.prototxt'))
-  # detections_filename = '/tmp/detection_results.bin'
+  detections_filename = join('/tmp',
+    '_'.join([model, wnid, video_id, 'detection', 'results']))
+  if not exists(detections_filename):
+    detect(image_dir, detections_filename, MODELS[model][0], MODELS[model][1])
   if not exists(detections_filename):
     print 'Something went wrong during detection'
     sys.exit(1)
-  draw_detection_results(detections_filename,
-    join(ROOT, 'data/imagenet', wnid, 'annotated', basename(image_dir)))
+  draw_detection_results(detections_filename, annotated_dir)
 
 def show_nouns_in_videos(num_videos_per_noun):
   '''
@@ -81,7 +84,7 @@ def show_nouns_in_videos(num_videos_per_noun):
     for noun_id, video_id_list in get_noun_ids_and_video_ids(
                         num_videos_per_noun).iteritems():
       for i, video_id in enumerate(video_id_list):
-        where_is_noun_in_video(video_id, noun_id)
+        draw_noun_detections_on_video_frames(video_id, noun_id)
         f.write(' '.join([str(datetime.now()),
                           noun_id,
                           video_id,
@@ -115,17 +118,10 @@ def test_classification_of_bananas():
   for image in images:
     test_classification(image, 'banana')
 
-def test_image_annotator():
-  # set the TOP_PERCENTAGE to 0.005 to not detect the noun
-  # set the TOP_PERCENTAGE to 0.01 to detect the noun
-  draw_detector_results('/tmp/detection_results.bin',
-    'zPN6ec7SevU_10000_n02965783',
-    'n02965783')
-
 def test_detector_on_eggs():
   video_ids = get_egg_video_ids(10)
   for video_id in video_ids:
-    where_is_noun_in_video(video_id, 'n07840804')
+    draw_noun_detections_on_video_frames(video_id, 'n07840804')
 
 if __name__ == '__main__':
   test_detector_on_eggs()
