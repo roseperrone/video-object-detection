@@ -27,7 +27,7 @@ data/imagenet/<wnid_dir>/snapshots/images/<dataset>/snapshots/snapshot
 The snapshots directory must exist, and the "snapshot" will be the prefix of
 "_iter_100..."
 Change the "server_mode:" to CPU
-Change the "snapshot:" to 1500. On my macbook, it takes 3 minutes per 20
+Change the "snapshot:" to 1000. On my macbook, it takes 3 minutes per 20
 iterations, so this produces one snapshot per half hour. On a K40 machine
 training the bvlc_reference_caffenet, training the
 bvlc_refference_caffenet on 1000 ImageNet categories takes 26 seconds per
@@ -35,7 +35,7 @@ bvlc_refference_caffenet on 1000 ImageNet categories takes 26 seconds per
 5100 images. I'm training on about 4500 images, with equal numbers of negative
 and positive images.
 Don't bother reducing "max_iter", because you can interrupt training at any time.
-Change "test_iter" to 1500. It takes a long time to test, so we want to do
+Change "test_iter" to 1000. It takes a long time to test, so we want to do
 this infrequently, but its purpose is to help us identify when we begin to
 overtrain, which helps us select which snapshot to use to detect objects.
 

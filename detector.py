@@ -48,7 +48,4 @@ def detect(image_dir, output_filename,
   cmd += ' ' + output_filename
   if HUSH_CAFFE:
     cmd += ' > /dev/null'
-  print cmd
   system(cmd)
-  print output_filename
-  return output_filename

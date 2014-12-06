@@ -1,10 +1,5 @@
 '''
-  Detection and classification use the 19-layer neural net from:
-    Very Deep Convolutional Networks for Large-Scale Image Recognition
-    K. Simonyan, A. Zisserman
-    arXiv:1409.1556
-  You can find information about this neural net here:
-    https://gist.github.com/ksimonyan/3785162f95cd2d5fee77#file-readme-md
+TODO
 '''
 from os.path import dirname, abspath, basename, join, exists
 import sys
@@ -28,12 +23,20 @@ ROOT = dirname(abspath(__file__))
 # The key is the trained model name, and the value is a tuple containing
 # a path to the caffemodel and the deploy.prototxt of the trained model
 MODELS = {
+  # Accuracy per test iteration:
+  #  0: 0.904
+  #  2000: 0.976
+  #  4000: 0.965
+  #  6000: 0.965
   'alexnet': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot_iter_6000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/deploy.prototxt'
   ),
+  # Accuracy per test iteration:
+  #  0: 0.738
+  #
   'nin-equal': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_500.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
   ),
 }
@@ -67,7 +70,7 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
     return
 
   detections_filename = join('/tmp',
-    '_'.join([model, wnid, video_id, 'detection', 'results']))
+    '_'.join(['detection', 'results', model, wnid, video_id]) + '.bin')
   if not exists(detections_filename):
     detect(image_dir, detections_filename, MODELS[model][0], MODELS[model][1])
   if not exists(detections_filename):

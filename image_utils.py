@@ -89,7 +89,9 @@ def resize_and_paste(image, new_shape):
 def convert_bgr_to_rgb(image_filename, channel_order=(2,1,0)):
   image = np.asarray(Image.open(image_filename))
   image = image[:, :, channel_order]
-  tf = tempfile.NamedTemporaryFile(dir='/tmp', delete=False)
+  tmp = '/tmp/image-conversion'
+  system('mkdir -p ' + tmp)
+  tf = tempfile.NamedTemporaryFile(dir=tmp, delete=False)
   Image.fromarray(image).save(tf.name, format='JPEG')
   return tf.name
 
