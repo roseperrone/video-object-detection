@@ -24,10 +24,12 @@ ROOT = dirname(abspath(__file__))
 # a path to the caffemodel and the deploy.prototxt of the trained model
 MODELS = {
   # Accuracy per test iteration:
-  #  0: 0.904
+  #  0:    0.904
   #  2000: 0.976
-  #  4000: 0.965
+  #  4000: 0.970
   #  6000: 0.965
+  # I stopped training this at iteration 7000
+  # lr = 0.01
   'alexnet': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot_iter_6000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/deploy.prototxt'
@@ -35,6 +37,7 @@ MODELS = {
   # Accuracy per test iteration:
   #  0: 0.738
   #
+  # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-equal': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
@@ -77,49 +80,6 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
     print 'Something went wrong during detection'
     sys.exit(1)
   draw_detection_results(detections_filename, annotated_dir)
-
-def show_nouns_in_videos(num_videos_per_noun):
-  '''
-  Run tail -f /tmp/detector_log.txt to see progress.
-  '''
-  log_filename = '/tmp/detector_log.txt'
-  with open(log_filename, 'a') as f:
-    for noun_id, video_id_list in get_noun_ids_and_video_ids(
-                        num_videos_per_noun).iteritems():
-      for i, video_id in enumerate(video_id_list):
-        draw_noun_detections_on_video_frames(video_id, noun_id)
-        f.write(' '.join([str(datetime.now()),
-                          noun_id,
-                          video_id,
-                          str(i) + '/' + str(num_videos_per_noun) + '\n',
-                         ]))
-        f.flush()
-
-def test_classification(image_filename, wnid):
-  '''
-  Classifies one BGR image and shows the results
-  '''
-  # TODO this is out of date
-  predictions = classify(image_filename)
-  image = np.asarray(Image.open(
-    draw_classifier_results(predictions, wnid, image_filename)))
-  Image.fromarray(image).save(
-    'data/labelled-test-images/' + basename(image_filename))
-  show_image(image)
-
-def test_classification_of_bananas():
-  image_that_contains_bananas = '/Users/rose/video-object-detection/' + \
-                                'data/images/9uddKYGPEkg_10000/30000.jpg'
-
-  # the same image above, but cropped to contain only bananas
-  image_that_contains_only_bananas = '/Users/rose/' + \
-    'video-object-detection/data/test-images/bananas_only_30000.jpg'
-
-  images = [image_that_contains_bananas,
-            image_that_contains_only_bananas]
-
-  for image in images:
-    test_classification(image, 'banana')
 
 def test_detector_on_eggs():
   video_ids = get_egg_video_ids(10)
