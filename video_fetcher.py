@@ -3,11 +3,8 @@ from os import system
 import pafy
 import re
 
-from performance import timeit
-
 ROOT = dirname(abspath(__file__))
 
-@timeit
 def fetch_video(url):
   '''
   Returns the filename of the downloaded mp4

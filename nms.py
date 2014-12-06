@@ -33,7 +33,7 @@ def get_boxes(detection_output_file):
         boxes[filename] = nms_detections(data, 0.1)
       data = np.empty(shape=[0, 5])
     pred = df.prediction[i].as_matrix()
-    if pred[1] > 0.99:
+    if pred[0] == 0 or pred[1] / pred[0] > 10:
       pos += 1
       data = np.append(data,
                 [[df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i], pred[1]]],

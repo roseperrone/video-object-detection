@@ -59,7 +59,7 @@ MODELS = {
   #  6000: 0.981
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-equal': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_6000.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/actual-snapshots/snapshot_iter_6000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
   ),
 

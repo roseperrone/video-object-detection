@@ -9,13 +9,11 @@ SPP_net is faster, but making it work on Mac turned out to be difficult.
 from os.path import join, dirname, abspath
 from os import system
 
-from performance import timeit
 from image_utils import ordered_listdir
 from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
 
 ROOT = dirname(abspath(__file__))
 
-@timeit
 def detect(image_dir, output_filename,
       caffemodel='data/models/bvlc_reference_caffenet.caffemodel',
       deploy_prototxt='data/models/bvlc_reference_caffenet/deploy.prototxt'):

@@ -11,8 +11,6 @@ import tempfile
 import pylab
 import re
 
-from performance import timeit
-
 ROOT = dirname(abspath(__file__))
 
 def get_prepared_images(url, ms_between_frames, video_filename, wnid=None):
@@ -38,7 +36,6 @@ def get_prepared_images(url, ms_between_frames, video_filename, wnid=None):
   system('mkdir -p ' + image_dir)
   return _prepare_images(video_filename, image_dir, ms_between_frames)
 
-@timeit
 def _prepare_images(video_filename, image_dir, ms_between_frames):
   cap = cv2.VideoCapture(video_filename)
   frame_count = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
