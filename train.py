@@ -18,7 +18,7 @@ gflags.MarkFlagAsRequired('dataset_dir')
 gflags.DEFINE_boolean('time', False, 'Set to true if you are interested in '
   'dissecting the runtime')
 gflags.DEFINE_string('snapshot', None, 'If training got interrupted, '
-  'resume from this snapshot')
+  'resume from this snapshot. This snapshot is a .solverstate file.')
 gflags.DEFINE_string('pretrained_caffemodel', None, 'The path to a .caffemodel '
   'you want to finetune')
 

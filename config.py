@@ -41,3 +41,8 @@ NUM_FIRST_FRAMES_SKIPPED = 1
 
 # caffe prints a lot
 HUSH_CAFFE = False
+
+# Non-maximum suppression: Greedily select high-scoring detections and
+# skip detections that are significantly covered by a previously
+# selected detection. The defaut is 0.3
+NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD = 0.05

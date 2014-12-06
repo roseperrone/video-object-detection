@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 
+from config import NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD
+
 def get_boxes(detection_output_file):
   '''
   Runs non-maximal suppression over each image.
@@ -28,7 +30,7 @@ def get_boxes(detection_output_file):
     if df.index[i] != filename:
       filename = df.index[i]
       if data.size > 0:
-        boxes[filename] = nms_detections(data, 0.9)
+        boxes[filename] = nms_detections(data, 0.1)
       data = np.empty(shape=[0, 5])
     pred = df.prediction[i].as_matrix()
     if pred[1] > 0.99:
