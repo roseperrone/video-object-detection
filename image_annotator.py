@@ -24,9 +24,12 @@ def draw_detection_results(detection_output_filename, target_dir):
     for xmin, ymin, xmax, ymax, score in bs:
       cmd += (' -draw "rectangle %s,%s,%s,%s" ' %
                 (int(xmin), int(ymin), int(xmax), int(ymax)))
-      cmd += ' -pointsize 17 -fill chartreuse'
-      text = 'Score:' + "{:.2f}".format(score)
-      cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
+      # Text drawing code strangely doesn't work on my machine.
+      # See the question I posted on SO:
+      # http://stackoverflow.com/questions/27324930/convert-non-conforming-drawing-primitive-definition-text/27332225#27332225
+      #cmd += ' -pointsize 17 -fill chartreuse'
+      #text = 'Score:' + "{:.2f}".format(score)
+      #cmd += ' -draw "text 20%%,20%% \'%s\'"' % text
     target = join(target_dir, splitext(basename(image_filename))[0] + '.jpg')
     cmd += ' ' + target
     print cmd

@@ -6,8 +6,8 @@ by search query. The bounding boxes of detection results are drawn.
 Usage:
   Train a model according to the instructions in the README.md
   Add your model to MODELS.
-  Set the flags and you're good to go! There are also few parameters you
-  can change in the config.py
+  Run this script. in addition to the flags in this script, you can
+  also change a few parameters in config.py.
 '''
 from os.path import dirname, abspath, basename, join, exists
 from os import system
@@ -36,8 +36,9 @@ gflags.DEFINE_integer('ms_between_frames', 10000, 'The number of milliseconds'
 
 ROOT = dirname(abspath(__file__))
 
-# The key is the trained model name, and the value is a tuple containing
-# a path to the caffemodel and the deploy.prototxt of the trained model
+# The key is the trained model name, and the value is a tuple containing:
+#   - a path to the caffemodel
+#   - a path to the deploy.prototxt of the trained model
 MODELS = {
   # Accuracy per test iteration:
   #  0:    0.904
@@ -59,17 +60,22 @@ MODELS = {
   #  6000: 0.981
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-equal': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/actual-snapshots/snapshot_iter_6000.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/actual-snapshots/snapshot_iter_6500.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
   ),
+  # I stopped training this at iter 6500
 
   # Note that I accidentally wrote the snapshots for this model to nin-equal,
   # I just have to keep an eye on it during training and move the snapshots.
   # Accuracy per test iteration:
   #  0:    0.910
   #  1000: 0.908
-  #  2000: 0.
-  #  3000: 0.
+  #  2000: 0.919
+  #  3000: 0.931
+  #  4000: 0.934
+  #  5000: 0.951
+  #  6000: 0.9524
+  #  7000: 0.9518
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-high-neg': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1500.caffemodel',
@@ -113,13 +119,17 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   annotated_dir = join(dirname(dirname(MODELS[FLAGS.model][0])),
                        'annotated', basename(image_dir))
   if exists(annotated_dir):
+    print 'The annotated dir for ' + video_id + ' already exists'
     return
   system('mkdir -p ' + annotated_dir)
 
   detections_filename = join('/tmp',
     '_'.join(['detection', 'results', FLAGS.model, wnid, video_id]) + '.bin')
   if not exists(detections_filename):
+    print detections_filename, 'does not already exist'
     detect(image_dir, detections_filename, MODELS[FLAGS.model][0], MODELS[FLAGS.model][1])
+  else:
+    print detections_filename, 'already exists'
   if not exists(detections_filename):
     print 'Something went wrong during detection'
     sys.exit(1)

@@ -37,7 +37,7 @@ and positive images.
 Don't bother reducing "max_iter", because you can interrupt training at any time.
 Change "test_iter" to 1000. It takes a long time to test, so we want to do
 this infrequently, but its purpose is to help us identify when we begin to
-overtrain, which helps us select which snapshot to use to detect objects.
+overfit, which helps us select which snapshot to use to detect objects.
 
 Copy this to a new file called deploy.prototxt:
 
