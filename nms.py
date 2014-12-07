@@ -1,8 +1,11 @@
+from os import system
+
 import numpy as np
 import pandas as pd
 from collections import defaultdict
 
-from config import NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD
+from config import (NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD,
+                    POSITIVE_PREDICTION_SCORE_THRESHOLD)
 
 def get_boxes(detection_output_file):
   '''
@@ -30,15 +33,16 @@ def get_boxes(detection_output_file):
     if df.index[i] != filename:
       filename = df.index[i]
       if data.size > 0:
-        boxes[filename] = nms_detections(data, 0.1)
+        boxes[filename] = nms_detections(data,
+          NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD)
       else:
         boxes[filename] = np.array([])
       data = np.empty(shape=[0, 5])
     pred = df.prediction[i].as_matrix()
-    if pred[1] / (pred[0] + pred[1]) > 0.5:
+    if pred[1] / (pred[0] + pred[1]) > POSITIVE_PREDICTION_SCORE_THRESHOLD:
       pos += 1
       data = np.append(data,
-                [[df.xmin[i], df.xmax[i], df.ymin[i], df.ymax[i], pred[1]]],
+                [[df.xmin[i], df.ymin[i], df.xmax[i], df.ymax[i], pred[1]]],
                 axis=0)
     else:
       neg += 1
@@ -61,7 +65,7 @@ def nms_detections(dets, overlap=0.3):
     Parameters
     ----------
     dets: ndarray
-        each row is ['xmin', 'xmax', 'ymin', 'ymax', 'score']
+        each row is ['xmin', 'ymin', 'xmax', 'ymax', 'score']
     overlap: float
         minimum overlap ratio (0.3 default)
 
@@ -71,8 +75,8 @@ def nms_detections(dets, overlap=0.3):
         remaining after suppression.
     '''
     x1 = dets[:, 0]
-    x2 = dets[:, 1]
-    y1 = dets[:, 2]
+    y1 = dets[:, 1]
+    x2 = dets[:, 2]
     y2 = dets[:, 3]
     ind = np.argsort(dets[:, 4])
 
@@ -88,6 +92,7 @@ def nms_detections(dets, overlap=0.3):
       pick.append(i)
       ind = ind[:-1]
 
+
       # Find the overlap region between the ith detection and the rest of
       # the detections not yet considered. The goal is to remove the detections
       # that overlap too much with the ith detection.
@@ -96,7 +101,7 @@ def nms_detections(dets, overlap=0.3):
       xx2 = np.minimum(x2[i], x2[ind])
       yy2 = np.minimum(y2[i], y2[ind])
 
-      # intersection width and weight
+      # intersection width and height
       w = np.maximum(0., xx2 - xx1)
       h = np.maximum(0., yy2 - yy1)
 
@@ -124,3 +129,21 @@ def nms_detections(dets, overlap=0.3):
       ind = ind[np.nonzero(o <= overlap)[0]]
 
     return dets[pick, :]
+
+# for testing only
+def draw_boxes(dets):
+  system('mkdir -p /Users/rose/Desktop/boxes')
+  dst = '/Users/rose/Desktop/boxes/boxes.jpg'
+  system('cp /Users/rose/Desktop/white.jpg ' + dst)
+  for i in range(dets.shape[0]):
+    x1 = dets[i, 0]
+    y1 = dets[i, 1]
+    x2 = dets[i, 2]
+    y2 = dets[i, 3]
+
+    cmd = 'convert ' + dst
+    cmd += ' -fill none -stroke chartreuse -strokewidth 2'
+    cmd += (' -draw "rectangle %s,%s,%s,%s"' % (int(x1), int(y1), int(x2), int(y2)))
+    cmd +=  ' ' + dst
+    system(cmd)
+    print '%s, %s, %s, %s' % (int(x1), int(y1), int(x2), int(y2))

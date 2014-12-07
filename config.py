@@ -45,4 +45,11 @@ HUSH_CAFFE = False
 # Non-maximum suppression: Greedily select high-scoring detections and
 # skip detections that are significantly covered by a previously
 # selected detection. The defaut is 0.3
-NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD = 0.05
+NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD = 0.1
+
+# The positive prediction score divided by the sum of the positive
+# and negative prediction scores must be
+# greater than this number in order to be considered a positive prediction.
+# I might reduce this value back to 0.5 if I find training on a high ratio
+# of negative:positive classes helps reduce the false positive rate.
+POSITIVE_PREDICTION_SCORE_THRESHOLD = 0.8

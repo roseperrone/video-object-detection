@@ -76,6 +76,7 @@ MODELS = {
   #  5000: 0.951
   #  6000: 0.9524
   #  7000: 0.9518
+  #  8000: 0.954
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-high-neg': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1500.caffemodel',
