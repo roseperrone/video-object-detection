@@ -46,7 +46,7 @@ accuracy.py
 
 I'm trying to detect not a specific object, but a class of an object (e.g. all whole eggs, regardless of color, shape, size, decoration, orientation, shadows and partial obscurity). Deep nets can learn more complex models than shallow ones.
 
-Unlike surveillance, YouTube videos typically cut from scene to scene quickly, making object tracking of limited use. Furthermore, the object is typically not present in a vast majority of the scenes, so much time would be wasted tracking irrelevant objects. Perhaps an object tracker could be used after the this system identifies a handful of scenes in which the object is present.
+Unlike surveillance, YouTube videos typically cut from scene to scene quickly, making object tracking of limited use. Furthermore, the object is typically not present in a vast majority of the scenes, so much time would be wasted tracking irrelevant objects, but an object tracker could be used after the this system identifies a handful of scenes in which the object is present.
 
 #### Does it work well enough to be useful for robots?
 
@@ -69,5 +69,5 @@ There are few neural nets available on the Caffe Model Zoo. The net that has per
 
 #### Why not use unmodified neural nets already trained on the ImageNet ILSVRC 2012 dataset?
 
-The 1000 classes in the dataset does not contain eggs, or an analog. I tried classification using such an unmodified net, and the results weren't useful.
+The 1000 classes in the dataset does not contain eggs, or an analog. I tried classification using such an unmodified net, and the results weren't useful. I am, however, finetuning a couple of these pretrained nets.
 

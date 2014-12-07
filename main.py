@@ -29,7 +29,7 @@ import gflags
 from gflags import FLAGS
 from flags import set_gflags
 
-gflags.DEFINE_string('model', 'nin-equal', 'The name of the model in MODELS to'
+gflags.DEFINE_string('model', 'nin-high-neg', 'The name of the model in MODELS to'
   ' use to detect objects')
 gflags.DEFINE_integer('ms_between_frames', 10000, 'The number of milliseconds'
   ' between frames in each video')
@@ -60,10 +60,14 @@ MODELS = {
   #  6000: 0.981
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-equal': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/actual-snapshots/snapshot_iter_6500.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_6500.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
   ),
   # I stopped training this at iter 6500
+  # I judged predictions on 10 videos and computed this accuracy:
+  #   precision: 0.282051282051
+  #   recall: 0.22
+
 
   # Note that I accidentally wrote the snapshots for this model to nin-equal,
   # I just have to keep an eye on it during training and move the snapshots.
@@ -77,18 +81,19 @@ MODELS = {
   #  6000: 0.9524
   #  7000: 0.9518
   #  8000: 0.954
+  #  9000: 0.952
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-high-neg': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1500.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/snapshots/snapshot_iter_9000.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/aux/deploy.prototxt'
   ),
 
   # the neg:pos train ratio will depend on the previous experiment.
   # Accuracy per test iteration: #  0:
   #
   'bvlc-reference-finetuned': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_1500.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/aux/deploy.prototxt'
   ),
 
   # then maybe finetune nin

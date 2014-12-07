@@ -44,7 +44,8 @@ import sys
 import pygame
 import pygame.locals as pygame_locals
 import shutil
-from os import system, listdir
+import glob
+from os import system
 import json
 from os.path import join, basename, abspath, dirname
 
@@ -58,8 +59,8 @@ gflags.MarkFlagAsRequired('src')
 
 ROOT = dirname(abspath(__file__))
 
-def show_image(name):
-  img = pygame.image.load(join(FLAGS.src, name))
+def show_image(path):
+  img = pygame.image.load(path)
   screen = pygame.display.set_mode((img.get_width(), img.get_height()))
   screen.blit(img, (0, 0))
   pygame.display.flip()
@@ -79,32 +80,35 @@ def print_text(text, img, screen):
 def finished():
   with open(LOG) as f_done:
     lines = list(f_done)
-    done = [json.loads(line)['name'] for line in lines]
-  names = listdir(FLAGS.src)
-  for name in names:
-    if name not in done:
+    done = [json.loads(line)['path'] for line in lines]
+  paths = get_jpgs(FLAGS.src)
+  for path in paths:
+    if path not in done:
       return False
   return True
 
-def add_line_to_log(name, code):
+def add_line_to_log(path, code):
   with open(LOG, 'a') as f:
-    f.write(json.dumps({'name':name,
+    f.write(json.dumps({'path':path,
                         'code':code}) + '\n');
 
-def remove_line_from_log(name):
+def remove_line_from_log(path):
   with open(LOG) as f:
     lines = f.readlines()
   with open(LOG, 'w') as f:
     for line in lines:
-      if not json.loads(line)['name'] == name:
+      if not json.loads(line)['path'] == path:
         f.write(line)
+
+def get_jpgs(dir):
+  return glob.glob(join(dir, '*', '*.[Jj][Pp][Gg]'))
 
 if __name__ == '__main__':
   global LOG
   set_gflags()
-  LOG = join(dirname(dirname(abspath(FLAGS.src))),
-             'prediction-logs', basename(FLAGS.src) + '.csv')
-  system('mkdir -p ' + basename(LOG));
+  prediction_logs_dir = join(dirname(FLAGS.src), 'prediction-logs')
+  system('mkdir -p ' + prediction_logs_dir);
+  LOG = join(prediction_logs_dir, basename(FLAGS.src) + '.csv')
   system('touch ' + LOG);
   pygame.init()
   judged = []
@@ -112,12 +116,12 @@ if __name__ == '__main__':
   while not finished():
     with open(LOG, 'r') as f_done:
       lines = list(f_done)
-      done = [json.loads(line)['name'] for line in lines]
-    unjudged = [name for name in listdir(FLAGS.src) if name not in done]
+      done = [json.loads(line)['path'] for line in lines]
+    unjudged = [path for path in get_jpgs(FLAGS.src) if path not in done]
 
     while len(unjudged) > 0:
-      name = unjudged.pop()
-      img, screen = show_image(join(FLAGS.src, name))
+      path = unjudged.pop()
+      img, screen = show_image(path)
       done = False
       code = ''
       while not done:
@@ -130,10 +134,10 @@ if __name__ == '__main__':
               if len(judged) > 0:
                 # skip the current image
                 code = ''
-                unjudged.append(name)
-                name = judged.pop()
-                remove_line_from_log(name)
-                img, screen = show_image(name)
+                unjudged.append(path)
+                path = judged.pop()
+                remove_line_from_log(path)
+                img, screen = show_image(path)
             elif event.key == pygame.K_c:
               code += 'c'
               print_text(code, img, screen)
@@ -148,6 +152,6 @@ if __name__ == '__main__':
               or event.key == pygame.K_KP_ENTER \
               or event.key == pygame.K_SPACE:
                 done = True
-                add_line_to_log(name, code)
+                add_line_to_log(path, code)
                 break
-      judged.append(name)
+      judged.append(path)
