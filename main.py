@@ -29,8 +29,8 @@ import gflags
 from gflags import FLAGS
 from flags import set_gflags
 
-gflags.DEFINE_string('model', 'nin-high-neg', 'The name of the model in MODELS to'
-  ' use to detect objects')
+gflags.DEFINE_string('model', 'nin-high-neg', 'The name of the model in'
+  ' MODELS to use to detect objects')
 gflags.DEFINE_integer('ms_between_frames', 10000, 'The number of milliseconds'
   ' between frames in each video')
 
@@ -208,7 +208,8 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
     '_'.join(['detection', 'results', FLAGS.model, wnid, video_id]) + '.bin')
   if not exists(detections_filename):
     print detections_filename, 'does not already exist'
-    detect(image_dir, detections_filename, MODELS[FLAGS.model][0], MODELS[FLAGS.model][1])
+    detect(image_dir, detections_filename,
+           MODELS[FLAGS.model][0], MODELS[FLAGS.model][1])
   else:
     print detections_filename, 'already exists'
   if not exists(detections_filename):
@@ -217,7 +218,7 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   draw_detection_results(detections_filename, annotated_dir)
 
 def test_detector_on_eggs():
-  video_ids = get_egg_video_ids(30)
+  video_ids = get_egg_video_ids(100)
   for video_id in video_ids:
     draw_noun_detections_on_video_frames(video_id, 'n07840804')
 

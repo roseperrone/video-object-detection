@@ -11,7 +11,7 @@
 - Instructions to generate the auxillary files necessary for training a model from scratch, or finetuning it
 - Neural net trainer (a wrapper around Caffe's solver)
 - Object detector, using a trained net (a wrapper around Caffe's detector)
-- Image annotator
+- Image annotator, which draws detected bounding boxes
 - A pygame to judge the detections
 - A script to compute the precision and recall of said judgements
 

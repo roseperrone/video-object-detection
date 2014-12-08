@@ -30,6 +30,8 @@ BLACKLIST = ['Zp2kJ2cstmU',
              'ShnyBIm2GOQ',
              'wdasrVE5NOc',
              'lbzhyvH74w8', # selective_search fails on this one
+             'DKkNi7enlUk',
+             'PN2gYHJNT3Y',
             ]
 
 def get_egg_video_ids(count):

@@ -39,7 +39,6 @@ def get_boxes(detection_output_file):
         boxes[filename] = np.array([])
       data = np.empty(shape=[0, 5])
     pred = df.prediction[i].as_matrix()
-    print pred[0], pred[1]
     if pred[1] / (pred[0] + pred[1]) > POSITIVE_PREDICTION_SCORE_THRESHOLD:
       pos += 1
       data = np.append(data,
