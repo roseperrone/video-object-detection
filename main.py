@@ -29,8 +29,9 @@ import gflags
 from gflags import FLAGS
 from flags import set_gflags
 
-gflags.DEFINE_string('model', 'nin-high-neg', 'The name of the model in'
+gflags.DEFINE_string('model', None, 'The name of the model in'
   ' MODELS to use to detect objects')
+gflags.MarkFlagAsRequired('model')
 gflags.DEFINE_integer('ms_between_frames', 10000, 'The number of milliseconds'
   ' between frames in each video')
 
@@ -170,8 +171,17 @@ MODELS = {
   #  1000: 0.966
   #  2000: 0.989 (retested at 0.985)
 
+# The same data prep for nin-finetuned applies to bvlc-finetuned
+  'bvlc-finetuned': (
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
+    'bvlc-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/bvlc-finetuned/deploy.prototxt'
+  ),
+  # Accuracy per test iteration:
+  #  0:    0.835
+  #  1000: 0.
+  #  2000: 0.
 
-  # TODO finetune the bvlc_reference_caffenet
 
 }
 
