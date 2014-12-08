@@ -1,4 +1,4 @@
-name: "CaffeNet"
+name: "bvlc-finetuned"
 input: "data"
 input_dim: 10
 input_dim: 3
@@ -196,10 +196,10 @@ layers {
   }
 }
 layers {
-  name: "fc8"
+  name: "fc8-finetuned"
   type: INNER_PRODUCT
   bottom: "fc7"
-  top: "fc8"
+  top: "fc8-finetuned"
   inner_product_param {
     num_output: 1000
   }
@@ -207,6 +207,6 @@ layers {
 layers {
   name: "prob"
   type: SOFTMAX
-  bottom: "fc8"
+  bottom: "fc8-finetuned"
   top: "prob"
 }

@@ -69,23 +69,8 @@ e.g.:
   - weight_decay
   - weight_filler
   - bias_filler
-Delete the "accuracy" layer and any layer after it (probably the softmax)
-Append to the file this final layer:
-
-```
-# R-CNN classification layer made from R-CNN ILSVRC13 SVMs.
-layers {
-  name: "fc-rcnn"
-  type: INNER_PRODUCT
-  bottom: <name of layer right above this one>
-  top: "fc-rcnn"
-  inner_product_param {
-    num_output: <change this to the number of categories>
-  }
-}
-```
-In the last layer before the R-CNN layer that contains a "num_output" field,
-change that value to the number of categories (in my case, 2).
+Change the value of the layer that contains a "num_output" field
+to the number of categories (in my case, 2).
 
 Then train the model until you see its test accuracy decreases significantly.
 This decrease indicates the model is overfitting. Simply kill train.py and

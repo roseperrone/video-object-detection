@@ -1,17 +1,17 @@
-name: "CaffeNet"
+name: "bvlc-finetuned"
 layers {
   name: "data"
   type: DATA
   top: "data"
   top: "label"
   data_param {
-    source: "examples/imagenet/ilsvrc12_train_lmdb"
+    source: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-finetuned/ilsvrc12_train_lmdb"
     backend: LMDB
-    batch_size: 256
+    batch_size: 64
   }
   transform_param {
     crop_size: 227
-    mean_file: "data/ilsvrc12/imagenet_mean.binaryproto"
+    mean_file: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-finetuned/image_mean.binaryproto"
     mirror: true
   }
   include: { phase: TRAIN }
@@ -22,13 +22,13 @@ layers {
   top: "data"
   top: "label"
   data_param {
-    source: "examples/imagenet/ilsvrc12_val_lmdb"
+    source: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-finetuned/ilsvrc12_test_lmdb"
     backend: LMDB
     batch_size: 50
   }
   transform_param {
     crop_size: 227
-    mean_file: "data/ilsvrc12/imagenet_mean.binaryproto"
+    mean_file: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-finetuned/image_mean.binaryproto"
     mirror: false
   }
   include: { phase: TEST }
@@ -309,16 +309,16 @@ layers {
   }
 }
 layers {
-  name: "fc8"
+  name: "fc8-finetuned"
   type: INNER_PRODUCT
   bottom: "fc7"
-  top: "fc8"
+  top: "fc8-finetuned"
   blobs_lr: 1
   blobs_lr: 2
   weight_decay: 1
   weight_decay: 0
   inner_product_param {
-    num_output: 1000
+    num_output: 2
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -332,7 +332,7 @@ layers {
 layers {
   name: "accuracy"
   type: ACCURACY
-  bottom: "fc8"
+  bottom: "fc8-finetuned"
   bottom: "label"
   top: "accuracy"
   include: { phase: TEST }
@@ -340,7 +340,7 @@ layers {
 layers {
   name: "loss"
   type: SOFTMAX_LOSS
-  bottom: "fc8"
+  bottom: "fc8-finetuned"
   bottom: "label"
   top: "loss"
 }
