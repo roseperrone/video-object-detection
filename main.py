@@ -217,7 +217,7 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   draw_detection_results(detections_filename, annotated_dir)
 
 def test_detector_on_eggs():
-  video_ids = get_egg_video_ids(10)
+  video_ids = get_egg_video_ids(30)
   for video_id in video_ids:
     draw_noun_detections_on_video_frames(video_id, 'n07840804')
 

@@ -19,6 +19,19 @@ def invert_dictionary(d):
       new_dict[elem].append(k)
   return new_dict
 
+# These videos don't have eggs in them, or they only
+# have tiny eggs in people's hands, at leats when the
+# ms_between_frames is 10000
+BLACKLIST = ['Zp2kJ2cstmU',
+             'pAWduxoCgVk',
+             'PLDUqyS2AGA',
+             'R4vDqlKMbrk',
+             's9r-CxnCXkg',
+             'ShnyBIm2GOQ',
+             'wdasrVE5NOc',
+             'lbzhyvH74w8', # selective_search fails on this one
+            ]
+
 def get_egg_video_ids(count):
   video_ids = []
   videos_per_query = count / len(EGG_QUERIES)
@@ -30,7 +43,7 @@ def get_egg_video_ids(count):
       remainder = 0
     video_ids.extend(search_youtube(query,
                                     fetch_this_many_video_ids))
-  return video_ids
+  return [id for id in video_ids if id not in BLACKLIST]
 
 def get_noun_ids_and_video_ids(num_videos_per_noun):
   '''
