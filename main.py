@@ -114,18 +114,20 @@ MODELS = {
   #
 
   # This model uses an equal neg:pos train ratio. I also removed all images from
-  # the positive set except clean, white, mostly-unobscured chicken eggs.
-  # I also changed the neg:pos test ratio to 8.
+  # the positive set except clean, white or off-white, mostly-unobscured
+  # whole eggs. In donig so, I reduced the numbor of positive images from
+  # 2226 to 523. I also changed the neg:pos test ratio to 8, and I changed
+  # the train:test ratio to 20 instead of 40.
   # Accuracy per test iteration:
   #  0:
   #
 
-  'bvlc-reference-finetuned': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/aux/deploy.prototxt'
+  'nin-finetuned': (
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-finetuned/aux/deploy.prototxt'
   ),
 
-  # then maybe finetune nin
+  # then maybe finetune the bvlc_reference_caffenet
 
 }
 

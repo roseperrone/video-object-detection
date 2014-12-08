@@ -74,7 +74,7 @@ gflags.DEFINE_integer('negative_to_positive_test_ratio', 8, '')
 # (validation, really) set to train hyperparamaters, just to judge accuracy.
 # Otherwise I'd use 6, as in the
 # Maxout Networks paper: arxiv.org/pdf/1302.4389v4.pdf
-gflags.DEFINE_integer('train_to_test_ratio', 40, '')
+gflags.DEFINE_integer('train_to_test_ratio', 20, '')
 
 import sys
 from glob import glob
@@ -131,12 +131,7 @@ def create_train_and_test_splits():
   system('mkdir -p ' + train_dir)
   system('mkdir -p ' + test_dir)
 
-  cropped_dir = join(images_dir, 'all-positive-cropped')
-  if exists(cropped_dir):
-    all_positive_images_dir = cropped_dir
-  else:
-    all_positive_images_dir = join(images_dir, 'all-positive-uncropped')
-
+  all_positive_images_dir = join(images_dir, 'all-positive-cropped-and-clean')
   if not exists(all_positive_images_dir):
     print 'The positive_images_train_dir must be populated with images'
     sys.exit(1)
@@ -146,14 +141,18 @@ def create_train_and_test_splits():
 
   num_positive_test_images = \
     int(num_positive_images / (1 + FLAGS.train_to_test_ratio))
+  print 'num_positive_test_images:', num_positive_test_images
 
   num_positive_train_images = num_positive_images - num_positive_test_images
+  print 'num_positive_train_images:', num_positive_train_images
 
   num_negative_train_images = \
     FLAGS.negative_to_positive_train_ratio * num_positive_train_images
+  print 'num_negative_train_images:', num_negative_train_images
 
   num_negative_test_images = \
     num_positive_test_images * FLAGS.negative_to_positive_test_ratio
+  print 'num_negative_test_images:', num_negative_test_images
 
   num_negative_images = num_negative_train_images + num_negative_test_images
 

@@ -3,6 +3,8 @@ instructions on the flickr-style finetuning example:
 https://github.com/BVLC/caffe/tree/master/examples/finetune_flickr_style
 To avoid a loss of nan, change the weight_filler types from gaussian to xavier,
 and make sure the base learning rate is 0.001 or lower.
+Also make sure you change the two base_lr fields of the layer you're
+resetting to random weights to 10 and 20 (rather than 1 and 2)
 
 If you want to train a model from scratch, follow these instructions:
 After completeing these instructions, you will have made these 3 files:
