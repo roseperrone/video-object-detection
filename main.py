@@ -194,6 +194,9 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   '''
   url = video_url(video_id)
   video_filename = fetch_video(url)
+  if video_filename is None:
+    print video_id, 'skipped'
+    return
   image_dir = get_prepared_images(url, FLAGS.ms_between_frames,
                                   video_filename, wnid)
   wnid_dir = join(ROOT, 'data/imagenet', wnid)
@@ -218,7 +221,7 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   draw_detection_results(detections_filename, annotated_dir)
 
 def test_detector_on_eggs():
-  video_ids = get_egg_video_ids(100)
+  video_ids = get_egg_video_ids(20)
   for video_id in video_ids:
     draw_noun_detections_on_video_frames(video_id, 'n07840804')
 

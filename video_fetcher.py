@@ -11,6 +11,9 @@ def fetch_video(url):
   '''
   video = pafy.new(url)
   stream = get_stream(video)
+  if stream is None:
+    'Skipping ' + url
+    return None
   filename = downloaded_filename(url, video.title, stream.extension)
   # First check if we cached it
   mp4_filename = converted_mp4_filename(filename)
@@ -26,7 +29,8 @@ def get_stream(video):
     if stream.dimensions[0] >= 256 and stream.dimensions[1] >= 256 \
       and str(stream.extension) == 'm4v']
   if len(dimensions) == 0:
-    raise Exception('Video does not have a suffciently high resolution')
+    print 'Video does not have a suffciently high resolution'
+    return None
   res = min(dimensions, key=lambda x:x[0]*x[1])
 
   for stream in video.videostreams:
