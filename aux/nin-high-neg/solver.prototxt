@@ -1,0 +1,14 @@
+net: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/aux/train_val.prototxt"
+test_iter: 100 # was 1000? that seems huge.
+test_interval: 1000
+base_lr: 0.001 # When I trained with 0.01, the loss remained constant at 0.63
+lr_policy: "step"
+gamma: 0.1
+stepsize: 20000 # was 200000
+display: 20
+max_iter: 450000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/snapshots/snapshot"
+solver_mode: CPU

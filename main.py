@@ -48,8 +48,9 @@ MODELS = {
   # I stopped training this at iteration 7000
   # lr = 0.01
   'alexnet': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot_iter_6000.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
+    'alexnet/snapshots/snapshot_iter_6000.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/alxenet/deploy.prototxt'
   ),
 
   # Accuracy per test iteration:
@@ -60,8 +61,9 @@ MODELS = {
   #  6000: 0.981
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-equal': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/snapshots/snapshot_iter_6500.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-equal/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/'
+    'images/nin-equal/snapshots/snapshot_iter_6500.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/nin-equal/deploy.prototxt'
   ),
   # I stopped training this at iter 6500
   # I judged predictions on 10 videos and computed this accuracy:
@@ -84,8 +86,9 @@ MODELS = {
   #  9000: 0.952
   # lr = 0.001. When I trained with 0.01, the loss remained constant at 0.63
   'nin-high-neg': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/snapshots/snapshot_iter_9000.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
+    'nin-high-neg/snapshots/snapshot_iter_9000.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/high-neg/deploy.prototxt'
   ),
   # The data skew caused the predictions for the negative class to be all 0s.
   # A similar skew happened before with this NIN model, when an LMDB bug caused
@@ -120,14 +123,55 @@ MODELS = {
   # the train:test ratio to 20 instead of 40.
   # Accuracy per test iteration:
   #  0:
-  #
 
   'nin-finetuned': (
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
-    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-finetuned/aux/deploy.prototxt'
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
+    'nin-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/finetuned/deploy.prototxt'
   ),
+# The initial output is not good. The same constant loss of 0.693 occured
+# when the learning rate was too high at 0.01. I could try taking the learning
+# rate down to 0.005, or maybe base_lr of layer ccc8-finetuned should be halved.
+# TODO find out what causes exceptionally low initial accuarcy.
 
-  # then maybe finetune the bvlc_reference_caffenet
+# I1207 19:49:35.855978 2113241856 solver.cpp:247] Iteration 0, Testing net (#0)
+# I1207 19:57:59.032723 2113241856 solver.cpp:298]     Test net output #0: accuracy = 0.110674
+# I1207 19:58:10.862572 2113241856 solver.cpp:191] Iteration 0, loss = 1.35524
+# I1207 19:58:10.862649 2113241856 solver.cpp:403] Iteration 0, lr = 0.001
+# I1207 20:01:23.613678 2113241856 solver.cpp:191] Iteration 20, loss = 0.693147
+# I1207 20:01:23.620987 2113241856 solver.cpp:403] Iteration 20, lr = 0.001
+# I1207 20:04:30.676769 2113241856 solver.cpp:191] Iteration 40, loss = 0.693147
+# I1207 20:04:30.684061 2113241856 solver.cpp:403] Iteration 40, lr = 0.001
+# I1207 20:07:41.066269 2113241856 solver.cpp:191] Iteration 60, loss = 0.693147
+#
+# TODO find out what the base leraning rate has to do with the first iteration.
+# When I changed base_lr to 0.0003, I got this healthier training output:
+#
+#
+# I1207 22:48:26.989333 2113241856 solver.cpp:247] Iteration 0, Testing net (#0)
+# I1207 22:56:44.848688 2113241856 solver.cpp:298]     Test net output #0: accuracy = 0.782135
+# I1207 22:56:57.263177 2113241856 solver.cpp:191] Iteration 0, loss = 0.667033
+# I1207 22:56:57.263277 2113241856 solver.cpp:403] Iteration 0, lr = 0.0003
+# I1207 23:00:22.607585 2113241856 solver.cpp:191] Iteration 20, loss = 0.693147
+# I1207 23:00:22.614925 2113241856 solver.cpp:403] Iteration 20, lr = 0.0003
+# I1207 23:04:01.619460 2113241856 solver.cpp:191] Iteration 40, loss = 0.693147
+#
+# TODO this might have something to do with the massive skew in the nin-high-neg
+
+
+# The same data prep for nin-finetuned applies to nin-clean
+  'nin-clean': (
+    '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
+    'nin-clean/snapshots/snapshot_iter_2000.caffemodel',
+    '/Users/rose/home/video-object-detection/aux/nin-clean/deploy.prototxt'
+  ),
+  # Accuracy per test iteration:
+  #  0:    0.891
+  #  1000: 0.966
+  #  2000: 0.989 (retested at 0.985)
+
+
+  # TODO finetune the bvlc_reference_caffenet
 
 }
 

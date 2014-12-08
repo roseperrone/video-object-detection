@@ -76,7 +76,7 @@ def create_lmdbs():
         lines[i] = '    $EXAMPLE/ilsvrc12_test_lmdb\n'
       elif '--shuffle' in lines[i]:
         lines[i] = '    --shuffle=True \\\n'
-  create_imagenet_filename = join(DATASET_DIR, 'aux/create_imagenet.sh')
+  create_imagenet_filename = join(DATASET_DIR, 'create_imagenet.sh')
   with open(create_imagenet_filename, 'w') as f:
     f.writelines(lines)
   system('chmod 777 ' + create_imagenet_filename)
@@ -98,7 +98,6 @@ if __name__ == '__main__':
   WNID_DIR = join(ROOT, 'data/imagenet', FLAGS.wnid)
   global DATASET_DIR
   DATASET_DIR = join(WNID_DIR, 'images', FLAGS.dataset)
-  system('mkdir -p ' + join(DATASET_DIR, 'aux'))
   create_lmdbs()
   compute_image_mean()
   system('mkdir -p ' + join(DATASET_DIR, 'snapshots'))

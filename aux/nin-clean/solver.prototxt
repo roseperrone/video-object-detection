@@ -1,0 +1,14 @@
+net: "/Users/rose/home/video-object-detection/aux/nin-clean/train_val.prototxt"
+test_iter: 3 # batch size is 89 and I only have 213 test imaes
+test_interval: 1000
+base_lr: 0.001 # When I trained with 0.01, the loss remained constant at 0.693
+lr_policy: "step"
+gamma: 0.1
+stepsize: 20000 # was 200000
+display: 50
+max_iter: 45000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-clean/snapshots/snapshot"
+solver_mode: CPU

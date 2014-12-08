@@ -1,0 +1,14 @@
+net: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/aux/train_val.prototxt"
+test_iter: 1000
+test_interval: 2000 # was 1000
+base_lr: 0.01
+lr_policy: "step"
+gamma: 0.1
+stepsize: 10000 # was 100000
+display: 20
+max_iter: 450000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/alexnet/snapshots/snapshot"
+solver_mode: CPU

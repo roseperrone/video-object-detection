@@ -39,6 +39,8 @@ judge_predictions.py
 accuracy.py
 ```
 
+The only change I made to my local caffe repo is in python/detect.py:main,
+I return `df.to_pickle(args.output_file)` rather than a csv or h5.
 
 ## Discussion
 

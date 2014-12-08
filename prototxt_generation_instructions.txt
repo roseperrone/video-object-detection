@@ -10,24 +10,31 @@ If you want to train a model from scratch, follow these instructions:
 After completeing these instructions, you will have made these 3 files:
 train_val.protxt, solver.protxt, and deploy.prototxt
 
-Use absolute paths for simplicity.
+Use absolute paths for simplicity. The `aux` dir is kept in the github
+repo, becaues it sucks to lose these prototxt files!
 
 First, copy the model's train_val.prototxt to
-data/imagenet/<wnid_dir>/images/<dataset>/aux
+video-object-detection/aux/<dataset name>/
 Change the files for each "source:" and "mean_file:" line to the lmbd
 files and image mean created by prepare_data.py.
 Find the last layer that contains a "num_output" field and change that to
 the number of categories (in my case, two: one positive, one negative).
-I also change the batch_size to 64, in case I run out of memory
+I also change the train and test batch_size to 64, in case I run out of memory
 on my macbook.
+TODO balance the test batch_size, and the test_iter in the solver.prototxt,
+so that their product >= the number of test images.
 
 Copy the model's solver.prototxt to
-data/imagenet/<wnid_dir>/images/<dataset>/aux
+video-object-detection/aux/<dataset name>/
 Change the "net:" path to the path to the train_val.prototxt you just created.
 Change the "snapshot_prefix:" to
 data/imagenet/<wnid_dir>/snapshots/images/<dataset>/snapshots/snapshot
 The snapshots directory must exist, and the "snapshot" will be the prefix of
 "_iter_100..."
+Change the "test_iter" to a number such that the test batch_size (as defined
+in train_val.prototxt) is just large enough so that
+test_iter*batch_size >= count(test_images)
+
 Change the "server_mode:" to CPU
 Change the "snapshot:" to 1000. On my macbook, it takes 3 minutes per 20
 iterations, so this produces one snapshot per half hour. On a K40 machine
@@ -41,7 +48,9 @@ Change "test_iter" to 1000. It takes a long time to test, so we want to do
 this infrequently, but its purpose is to help us identify when we begin to
 overfit, which helps us select which snapshot to use to detect objects.
 
-Copy this to a new file called deploy.prototxt:
+Copy this to a new file called deploy.prototxt in
+video-object-detection/aux/<dataset name>/
+
 
 ```
 name: "<the name in the train_val.prototxt>"

@@ -12,9 +12,9 @@ from flags import set_gflags
 from os.path import join, dirname, abspath, exists
 from os import system
 
-gflags.DEFINE_string('dataset_dir', None, 'This is the directory that '
-  'contains `aux`, `snapshots`, and all the data relevant to training')
-gflags.MarkFlagAsRequired('dataset_dir')
+gflags.DEFINE_string('dataset', None, 'The name of the dataset on which'
+  ' you are training, e.g. nin-clean')
+gflags.MarkFlagAsRequired('dataset')
 gflags.DEFINE_boolean('time', False, 'Set to true if you are interested in '
   'dissecting the runtime')
 gflags.DEFINE_string('snapshot', None, 'If training got interrupted, '
@@ -26,7 +26,7 @@ ROOT = dirname(abspath(__file__))
 
 if __name__ == '__main__':
   set_gflags()
-  aux_dir = join(FLAGS.dataset_dir, 'aux')
+  aux_dir = join(ROOT, 'aux', FLAGS.dataset)
   cmd = join(ROOT, 'caffe/.build_release/tools/caffe.bin')
   if FLAGS.time:
     cmd += ' time --model=' + join(aux_dir, 'train_val.prototxt')
