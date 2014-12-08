@@ -87,10 +87,39 @@ MODELS = {
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/snapshots/snapshot_iter_9000.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/nin-high-neg/aux/deploy.prototxt'
   ),
-
-  # the neg:pos train ratio will depend on the previous experiment.
-  # Accuracy per test iteration: #  0:
+  # The data skew caused the predictions for the negative class to be all 0s.
+  # A similar skew happened before with this NIN model, when an LMDB bug caused
+  # me to have way more positive training images than negative training images.
+  # In that situation, the positive class had pred[0], pred[1] scores like this:
+  # 0.0 10.1965
+  # 0.0 89.606
+  # 0.0 15.007
+  # 0.0 8.72097
+  # 0.0 27.801
+  # 0.0 55.6223
   #
+  # and in this situation of having a 10:1 negative:positive training images ratio,
+  # pred[0], pred[1] scores look like this:
+  # 11.9817 0.0
+  # 8.1218 0.0
+  # 13.3314 0.0
+  # 6.01843 0.0
+  # 10.6878 0.0
+  # 15.3691 0.0
+  # 18.2615 0.0
+  # I'll keep equal numbers of negative and positive training images
+  # in the future. It's curious, though, that the test accuracy was steadily
+  # improving. I'm sure I'm training on the correct model, because this is
+  # the first model I've trained up to iteration 9000.
+  #
+
+  # This model uses an equal neg:pos train ratio. I also removed all images from
+  # the positive set except clean, white, mostly-unobscured chicken eggs.
+  # I also changed the neg:pos test ratio to 8.
+  # Accuracy per test iteration:
+  #  0:
+  #
+
   'bvlc-reference-finetuned': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/bvlc-reference-finetuned/aux/deploy.prototxt'

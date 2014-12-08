@@ -52,4 +52,4 @@ NON_MAXIMAL_SUPPRESSION_OVERLAP_THRESHOLD = 0.1
 # greater than this number in order to be considered a positive prediction.
 # I might reduce this value back to 0.5 if I find training on a high ratio
 # of negative:positive classes helps reduce the false positive rate.
-POSITIVE_PREDICTION_SCORE_THRESHOLD = 0.8
+POSITIVE_PREDICTION_SCORE_THRESHOLD = 0.5

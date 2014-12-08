@@ -33,7 +33,7 @@ def main():
 
 def show_image(lmdb_value):
   datum = caffe_pb2.Datum()
-  datum.ParseFromString(value)
+  datum.ParseFromString(lmdb_value)
   image = np.zeros((datum.channels, datum.height, datum.width))
   image = caffe.io.datum_to_array(datum)
   image = np.transpose(image, (1, 2, 0))

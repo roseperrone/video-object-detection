@@ -63,10 +63,10 @@ gflags.MarkFlagAsRequired('dataset')
 # negative image downlaoding short, so I actually use a ratio of 7.6
 # (17280 negative train images)
 #gflags.DEFINE_integer('negative_to_positive_train_ratio', 10, '')
-gflags.DEFINE_integer('negative_to_positive_train_ratio', 7, '')
+gflags.DEFINE_integer('negative_to_positive_train_ratio', 1, '')
 # 2000 ideally, but I'm going for speed right now:
 #gflags.DEFINE_integer('negative_to_positive_test_ratio', 50, '')
-gflags.DEFINE_integer('negative_to_positive_test_ratio', 10, '')
+gflags.DEFINE_integer('negative_to_positive_test_ratio', 8, '')
 # The above ratio default is similar to the number of bounding boxes detected
 # via selective search for each image.
 
