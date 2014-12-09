@@ -33,17 +33,22 @@ BLACKLIST = ['Zp2kJ2cstmU',
              'DKkNi7enlUk',
              'PN2gYHJNT3Y',
              'PUP7U5vTMM0',
+             'zglsDdaBf4g',
+             'yppgDL0Mn3g',
             ]
 
 def get_egg_video_ids(count):
   video_ids = []
   videos_per_query = count / len(EGG_QUERIES)
+  print 'videos per query', videos_per_query
   remainder = count - videos_per_query * len(EGG_QUERIES)
+  print 'remainder', remainder
   for query in EGG_QUERIES:
     fetch_this_many_video_ids = videos_per_query
     if remainder > 0:
       fetch_this_many_video_ids += remainder
       remainder = 0
+    print 'fetch this many video ids', fetch_this_many_video_ids
     video_ids.extend(search_youtube(query,
                                     fetch_this_many_video_ids))
   return [id for id in video_ids if id not in BLACKLIST]

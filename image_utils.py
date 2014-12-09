@@ -47,13 +47,13 @@ def _prepare_images(video_filename, image_dir, ms_between_frames):
     cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, i)
     retval, bgr_image = cap.read()
     filename = join(image_dir, str(image_count * ms_between_frames) + '.jpg')
-    Image.fromarray(prepare_image(bgr_image)).save(filename,
+    Image.fromarray(_prepare_image(bgr_image)).save(filename,
                                                    format='JPEG')
     image_count += 1
     print image_count, '/', frame_count/step
   return image_dir
 
-def prepare_image(bgr_image):
+def _prepare_image(bgr_image):
   'Resizes the images to 256x256'
   image = resize_and_paste(Image.fromarray(bgr_image), (256, 256))
   return np.asarray(image).astype(np.uint8)

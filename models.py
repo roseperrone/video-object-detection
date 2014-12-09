@@ -143,7 +143,7 @@ MODELS = {
 
   'bvlc-finetuned': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
-    'bvlc-finetuned/snapshots/snapshot_iter_3000.caffemodel',
+    'bvlc-finetuned/snapshots/snapshot_iter_9000.caffemodel',
     '/Users/rose/home/video-object-detection/aux/bvlc-finetuned/deploy.prototxt'
   ),
   # The same data prep for nin-finetuned applies to bvlc-finetuned
@@ -160,6 +160,7 @@ MODELS = {
   #  6000: 0.99
   #  7000: 0.995
   #  8000: 0.995
+  #  9000: 0.995
   #
   # I annotated these images using the model at snapshot_iter_2000.caffemodel:
   #   M8SHMUBnm4A_10000
@@ -167,5 +168,6 @@ MODELS = {
   #   PzWsyPHoSyQ_10000
   #   r09Hgeb9-6s_10000
   #   zglsDdaBf4g_10000
+  # All the others I annotated using snapshot_iter_9000.caffemodel.
 }
 

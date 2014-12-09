@@ -84,7 +84,10 @@ def draw_noun_detections_on_video_frames(video_id, wnid):
   draw_detection_results(detections_filename, annotated_dir)
 
 def test_detector_on_eggs():
-  video_ids = get_egg_video_ids(20)
+  # I choose 200 because we have 4 egg queries, and can fetch a maximum
+  # of 50 search items (including playlists, channels and video-ids) per
+  # query
+  video_ids = get_egg_video_ids(200)
   for video_id in video_ids:
     draw_noun_detections_on_video_frames(video_id, 'n07840804')
 

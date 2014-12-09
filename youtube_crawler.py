@@ -12,12 +12,16 @@ YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 
 def search_youtube(query, max_num_video_ids=3):
-  '''
-  max_results:
-    This number of results includes playlists and channels, not just video_ids
-  '''
   youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                   developerKey=DEVELOPER_KEY)
+
+  # YouTube enforces that max_results must be within the range [0, 50]
+  if 5*max_num_video_ids > 50:
+    max_results = 50
+  else:
+    # Fetch extra search results, because this number includes playlists
+    # and channels, not just video_ids.
+    max_results = 5*max_num_video_ids
 
   # Return five times as mayn results as we need, because we'll exclude
   # channels and playlists. This gives a large safety margin to return
@@ -25,7 +29,7 @@ def search_youtube(query, max_num_video_ids=3):
   search_response = youtube.search().list(
     q=query,
     part="id,snippet",
-    maxResults=5*max_num_video_ids,
+    maxResults=max_results,
     type='video'
   ).execute()
 
