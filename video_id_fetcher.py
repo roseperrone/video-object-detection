@@ -1,7 +1,7 @@
 from collections import OrderedDict, defaultdict
 
 from youtube_crawler import search_youtube
-from config import QUERIES_AND_NOUNS, EGG_QUERIES
+from queries import QUERIES_AND_NOUNS, EGG_QUERIES
 from imagenet import get_noun_id
 
 def invert_dictionary(d):
