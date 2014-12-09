@@ -2,7 +2,7 @@ net: "/Users/rose/home/video-object-detection/aux/bvlc-finetuned/train_val.proto
 test_iter: 4 # there are 216 test images. The test batch size is 54
              # 216/54 = 4
 test_interval: 1000
-base_lr: 0.01
+base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
 stepsize: 100000

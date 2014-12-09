@@ -170,17 +170,21 @@ MODELS = {
   #  0:    0.891
   #  1000: 0.966
   #  2000: 0.989 (retested at 0.985)
+  #  3000: 0.989
 
-# The same data prep for nin-finetuned applies to bvlc-finetuned
+  # The same data prep for nin-finetuned applies to bvlc-finetuned
+  # Note that I forgot to change the two blobs_lr fields of the the layer
+  # I reset to random weights to 10 and 20.
   'bvlc-finetuned': (
     '/Users/rose/home/video-object-detection/data/imagenet/n07840804/images/'
     'bvlc-finetuned/snapshots/snapshot_iter_xxxx.caffemodel',
     '/Users/rose/home/video-object-detection/aux/bvlc-finetuned/deploy.prototxt'
   ),
   # Accuracy per test iteration:
-  #  0:    0.835
-  #  1000: 0.
-  #  2000: 0.
+  #  0:    0.54
+  #  1000: 0.99
+  #  2000: 0.985
+  #  3000: 0.995
 
 
 }

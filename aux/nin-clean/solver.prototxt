@@ -4,7 +4,7 @@ test_interval: 1000
 base_lr: 0.001 # When I trained with 0.01, the loss remained constant at 0.693
 lr_policy: "step"
 gamma: 0.1
-stepsize: 20000 # was 200000
+stepsize: 20000 # was 200000. I probably should have kept it at 200000
 display: 50
 max_iter: 45000
 momentum: 0.9
