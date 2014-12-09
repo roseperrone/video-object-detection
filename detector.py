@@ -10,7 +10,7 @@ from os.path import join, dirname, abspath
 from os import system
 
 from image_utils import ordered_listdir
-from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED
+from config import N_FRAMES
 
 ROOT = dirname(abspath(__file__))
 
@@ -31,9 +31,7 @@ def detect(image_dir, output_filename,
   '''
   image_filenames_txt = '/tmp/image_filenames.txt'
   with open(image_filenames_txt, 'w') as f:
-    # the first frame is usually blank, or a title screen
-    image_filenames = ordered_listdir(
-      image_dir)[NUM_FIRST_FRAMES_SKIPPED:N_FRAMES+1]
+    image_filenames = ordered_listdir(image_dir)
     f.write('\n'.join(image_filenames))
   cmd = join(ROOT, 'caffe/python/detect.py')
   cmd += ' --pretrained_model=' + caffemodel

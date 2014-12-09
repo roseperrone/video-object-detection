@@ -10,6 +10,7 @@ import cv2
 import tempfile
 import pylab
 import re
+from config import NUM_FIRST_FRAMES_SKIPPED, N_FRAMES
 
 ROOT = dirname(abspath(__file__))
 
@@ -43,7 +44,8 @@ def _prepare_images(video_filename, image_dir, ms_between_frames):
 
   step = (ms_between_frames / 1000) * frames_per_s
   image_count = 0
-  for i in range(frame_count)[::step]:
+  # the first frame is usually blank, or a title screen
+  for i in range(frame_count)[step*NUM_FIRST_FRAMES_SKIPPED:step*N_FRAMES:step]:
     cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, i)
     retval, bgr_image = cap.read()
     filename = join(image_dir, str(image_count * ms_between_frames) + '.jpg')
