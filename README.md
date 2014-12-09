@@ -1,6 +1,7 @@
 # Simple object detection in YouTube videos, using Caffe
 
-![alt tag](https://github.com/roseperrone/video-object-detection/blob/master/good-egg.jpg)
+![alt tag](https://github.com/roseperrone/video-object-detection/blob/master/good-egg-bvlc-finetuned.jpg)
+![alt tag](https://github.com/roseperrone/video-object-detection/blob/master/good-egg-bvlc-finetuned-2.jpg)
 
 ## Components of this pipeline
 
@@ -55,7 +56,7 @@ Unlike surveillance, YouTube videos typically cut from scene to scene quickly, m
 
 #### Does it work well enough to be useful for robots?
 
-That depends on the noun you're trying to detect. It currently does not work well for detecting whole eggs. The detections in the image above are the best I've seen so far. (the `nin-clean` model detected that)
+That depends on the noun you're trying to detect. It currently does not work well for detecting whole eggs. The detections in the image above are the best I've seen so far. (the `bvlc-finetuned` model detected that. The `nin-clean` model performs almost as well).
 
 #### In what ways can this system improve?
 

@@ -36,6 +36,10 @@ BLACKLIST = ['Zp2kJ2cstmU',
              'zglsDdaBf4g',
              'yppgDL0Mn3g',
              '8ki3-ASg9c8',
+             '2f7i-ndrx9g',
+             'M74wTjym2mY',
+             'u_3MYVAJTHM',
+             'YjFttWU3xMw',
             ]
 
 def get_egg_video_ids(count):
