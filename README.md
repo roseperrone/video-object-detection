@@ -31,6 +31,7 @@ create_data_splits.py
 prepare_data.py
 Manually create the auxillary prototxt files now. See prototxt_generation_instructions.txt
 train.py
+Add the model to models.py
 ```
 
 #### To run the net on youtube videos to produce frames with the detected noun drawn in a bounding box, run these scripts
