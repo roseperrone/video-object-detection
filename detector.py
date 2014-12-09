@@ -10,7 +10,7 @@ from os.path import join, dirname, abspath
 from os import system
 
 from image_utils import ordered_listdir
-from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED, HUSH_CAFFE
+from config import N_FRAMES, NUM_FIRST_FRAMES_SKIPPED
 
 ROOT = dirname(abspath(__file__))
 
@@ -44,6 +44,4 @@ def detect(image_dir, output_filename,
   # code is buggy, and the hdf5 gave weird uint8 prediction values, so I
   # pickled the pandas DataFrame instead.
   cmd += ' ' + output_filename
-  if HUSH_CAFFE:
-    cmd += ' > /dev/null'
   system(cmd)

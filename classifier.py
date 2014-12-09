@@ -7,8 +7,6 @@ from os import system
 from os.path import join, splitext, basename, dirname, abspath
 import numpy as np
 
-from config import HUSH_CAFFE
-
 ROOT = dirname(abspath(__file__))
 
 # TODO this is out of date
@@ -26,8 +24,6 @@ def classify(image_filename):
   #cmd += ' --pretrained_model=data/models/VGG_ILSVRC_19_layers.caffemodel' TODO use this one
   cmd += ' ' + image_filename
   cmd += ' ' + predictions_filename
-  if HUSH_CAFFE:
-    cmd += ' > /dev/null'
   print cmd
   system(cmd)
   return np.load(predictions_filename).tolist()[0]
