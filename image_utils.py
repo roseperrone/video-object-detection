@@ -43,8 +43,8 @@ def _prepare_images(video_filename, image_dir, ms_between_frames):
   frames_per_s = int(cap.get(cv2.cv.CV_CAP_PROP_FPS))
 
   step = (ms_between_frames / 1000) * frames_per_s
-  image_count = 0
   # the first frame is usually blank, or a title screen
+  image_count = NUM_FIRST_FRAMES_SKIPPED
   for i in range(frame_count)[step*NUM_FIRST_FRAMES_SKIPPED:step*N_FRAMES:step]:
     cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, i)
     retval, bgr_image = cap.read()
