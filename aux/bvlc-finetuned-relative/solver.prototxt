@@ -1,0 +1,15 @@
+net: "aux/train_val.prototxt"
+test_iter: 20 # there are 1178 test images. The test batch size is 59
+             # 1180/59
+test_interval: 1000
+base_lr: 0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 100000
+display: 50
+max_iter: 450000
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1000
+snapshot_prefix: "snapshots/snapshot"
+solver_mode: GPU

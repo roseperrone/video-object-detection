@@ -2,7 +2,7 @@
 This script is used to record the bounding boxes of the noun in all images.
 There may be 0, 1, or many bounding boxes per image.
 
-All images must be in `data/imagenet/<wnid>/images/all`.
+All images must be in `data/imagenet/<wnid>/images/all-positive-uncropped`.
 Use `imagenet_image_fetcher` to do so.
 
 Usage:
@@ -23,6 +23,7 @@ from flags import set_gflags
 # This default wnid is for eggs
 gflags.DEFINE_string('wnid', 'n07840804',
                      'The wordnet id of the noun in the positive images')
+
 # It's easier to draw on bigger images
 gflags.DEFINE_integer('screen_size', 800, '')
 
@@ -179,7 +180,7 @@ if __name__ == '__main__':
   # Loop over the source filenames in case a line was deleted from the csv
   while 1:
     source_filenames = glob.glob(join(
-      ROOT, 'data/imagenet', FLAGS.wnid, 'images/all', '*.[Jj][Pp][Gg]'))
+      ROOT, 'data/imagenet', FLAGS.wnid, 'images/all-positive-uncropped', '*.[Jj][Pp][Gg]'))
     done_basenames = get_done_basenames(outfile)
     if len(done_basenames.intersection(
          set([basename(f) for f in source_filenames]))) == \

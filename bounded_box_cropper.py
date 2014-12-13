@@ -15,8 +15,11 @@ from gflags import FLAGS
 from flags import set_gflags
 
 # This default wnid is for eggs
-gflags.DEFINE_string('wnid', 'n07840804',
-                     'The wordnet id of the noun in the positive images')
+gflags.DEFINE_string('bounding_boxes_csv', None,
+                     'The log that contains the bounding box coordinates')
+gflags.MarkFlagAsRequired('bounding_boxes_csv')
+gflags.DEFINE_string('dst', None, 'Where to store the cropped images')
+gflags.MarkFlagAsRequired('dst')
 
 from cropping_utils import get_crop_box
 
@@ -30,12 +33,9 @@ ROOT = dirname(abspath(__file__))
 
 if __name__ == '__main__':
   set_gflags()
-  wnid_dir = join(ROOT, 'data/imagenet', FLAGS.wnid)
-  cropped_dir = join(wnid_dir, 'images/cropped')
-  print cropped_dir
-  system('mkdir -p ' + cropped_dir)
+  system('mkdir -p ' + FLAGS.dst)
   count = 0
-  with open(join(wnid_dir, 'bounding_boxes.csv')) as csvfile:
+  with open(FLAGS.bounding_boxes_csv) as csvfile:
     reader = csv.reader(csvfile)
     for row in reader:
       for i in range(1, len(row), 4):
@@ -45,7 +45,6 @@ if __name__ == '__main__':
         filename = row[0]
         image = Image.open(filename)
         width, height = image.size
-        name, _ = splitext(basename(filename))
+        target = join(FLAGS.dst, splitext(basename(filename))[0])
         image.crop(get_crop_box(row, i, width, height)
-           ).save(join(cropped_dir, name) + '_' + str(int(i/4)) + '.jpg')
-
+           ).save(target + '_' + str(int(i/4)) + '.jpg')
